@@ -9,12 +9,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
 using namespace std;
-float x = 0.0f;
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool keys[1024];
 GLfloat deltaTime = 0.0f;    // Time between current frame and last frame
@@ -30,6 +27,12 @@ GLint lanesCount = 20;
 
 void do_movement()
 {
+    
+    if(keys[GLFW_KEY_UP])
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if(keys[GLFW_KEY_DOWN])
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    
     if(keys[GLFW_KEY_W])
         camera.ProcessKeyboard(FORWARD, deltaTime);
     if(keys[GLFW_KEY_S])
@@ -72,8 +75,8 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 GLint laneHeight = 0;
-const GLint gameWidth = 400;
-const GLint gameHeight = gameWidth* 1.78;
+const GLint gameWidth = 500;
+const GLint gameHeight = 800;
 int main(int argc, const char * argv[]) {
     // Initialize GLFW
     glfwInit();
@@ -82,17 +85,7 @@ int main(int argc, const char * argv[]) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    
-    // For full screen
-    //    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    //    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-    //    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-    //    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-    //    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-    //
-    //    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, "CrossyRoad", glfwGetPrimaryMonitor(), NULL);
-    //    laneHeight = mode->height / 4;
-    
+   
     // Set some constants
     laneHeight = gameHeight / 4;
     
@@ -101,7 +94,7 @@ int main(int argc, const char * argv[]) {
     
     if (window == nullptr)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        cout << "Failed to create GLFW window" << endl;
         glfwTerminate();
         return -1;
     }
@@ -115,7 +108,7 @@ int main(int argc, const char * argv[]) {
     
     if (glewInit() != GLEW_OK)
     {
-        std::cout << "Failed to initialize GLEW" << std::endl;
+        cout << "Failed to initialize GLEW" << endl;
         return -1;
     }
     // Load shaders (normal shader and light source shader)
@@ -194,16 +187,10 @@ int main(int argc, const char * argv[]) {
     //              - No more than 2 safe lands next to each other
     //              - No more than 5 normal lanes next to each other
     //              - Start with a safe lane
-    // •lanesColorsAndSeparators[]: flags for coloring the lanes based on the following:
-    //                              - 0 by default
-    //                              - 1 if the current lane is safe lane and the next is safe lane too
-    //                              - 2 if current is normal lane and next is normal lane too
     
-    int lanes[] = {0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
-    
-    //    int lanesColorsAndSeparators[] =
-    //                  {0, 2, 0, 0, 1, 2, 2, 2, 0, 0, 1, 2, 2, 0, 0, 1, 2, 2, 2, 2, 2, 0, 1, 0, 2, 2, 2, 2, 2,
-    //        1, 0, 2, 2, 2, 2, 2, 0, 1, 0, 2, 2, 0, 1, 0, 2, 2, 2, 2, 2, 0, 1, 1};
+    int lanesData[] = {0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
+    std::vector<int> lanes (lanesData, lanesData + sizeof(lanesData) / sizeof(int) );
+
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents(); // Check for keyboard or mouse events
@@ -212,7 +199,14 @@ int main(int argc, const char * argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        // Move the camera around if any key clicked
+        // Check if generation needed
+        if (camera.Position.z < (int)(-1*lanes.size())){
+            for (int i = 1; i < 52; i++) {
+                lanes.push_back(lanesData[i]);
+            }
+            
+        }
+        //Check for arrows movement
         do_movement();
         
         // Clear screen with certain background color
@@ -248,7 +242,7 @@ int main(int argc, const char * argv[]) {
         
         //Draw cubes
         float zpos = 0;
-        for(GLuint i = 0; i < 30; i++)
+        for(GLuint i = 0; i < lanes.size(); i++)
         {
             glm::mat4 model;
             zpos -= 1;
@@ -265,7 +259,7 @@ int main(int argc, const char * argv[]) {
             glDrawArrays(GL_TRIANGLES, 0, 36);
             
             // Draw lane separator
-            if(i < 29 && lanes[i] == 1 && lanes[i+1] == 1){
+            if(i < lanes.size()-1 && lanes[i] == 1 && lanes[i+1] == 1){
                 zpos -= 1.1;
                 glm::mat4 model;
                 model = glm::translate(model, glm::vec3( 0.0f, 0.0f, zpos));
@@ -274,8 +268,7 @@ int main(int argc, const char * argv[]) {
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
                 glDrawArrays(GL_TRIANGLES, 0, 36);
                 zpos -= 0.1;
-            }
-            
+            }           
             
             // Reset uniforms
             glUniform1f(isSafeLaneLoc, 0.0f);

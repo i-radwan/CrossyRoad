@@ -52,10 +52,10 @@ public:
         this->Yaw = yaw;
         this->Pitch = pitch;
         this->updateCameraVectors();
-        this->Front = glm::vec3(-0.0592109, -0.669549, -0.740405);
-        this->Right = glm::vec3(0.996818, 0, -0.0797165);
-        this->Up = glm::vec3(-0.053374, 0.742768, -0.667418);
-        this->Position = glm::vec3(1.50197, 8.19151, 3.144337);
+        this->Front = glm::vec3(-0.0619703, -0.789572, -0.610521);
+        this->Right = glm::vec3(0.994888, 0, -0.100985);
+        this->Up = glm::vec3(-0.0797349, 0.613658, -0.785535);
+        this->Position = glm::vec3(3.05157, 16.8589, 3.81323);
         /**
          Front-0.197481 -0.425782 -0.883012
          Right0.975892 0 -0.218253
@@ -71,6 +71,11 @@ public:
          Front-0.0592109 -0.669549 -0.740405
          Right0.996818 0 -0.0797165
          Up-0.053374 0.742768 -0.667418
+         
+         Position3.05157 16.5589 3.91323
+         Front-0.0619703 -0.789572 -0.610521
+         Right0.994888 0 -0.100985
+         Up-0.0797349 0.613658 -0.785535
          */
     }
     // Constructor with scalar values
@@ -92,8 +97,13 @@ public:
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
     {
-        return;
         GLfloat velocity = this->MovementSpeed * deltaTime;
+        if (direction == FORWARD)
+            this->Position.z -= (velocity*8);
+//        if (direction == BACKWARD)
+//            this->Position -= this->Front * velocity;
+        
+        return;
         
         if (direction == FORWARD)
             this->Position += this->Front * velocity;
