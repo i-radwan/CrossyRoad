@@ -22,7 +22,7 @@ enum Camera_Movement {
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
 const GLfloat SPEED      =  3.0f;
-const GLfloat SENSITIVTY =  0.25f;
+const GLfloat SENSITIVTY =  0.9f;
 const GLfloat ZOOM       =  40.0f;
 
 
@@ -97,13 +97,13 @@ public:
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
     {
-        GLfloat velocity = this->MovementSpeed * deltaTime;
-        if (direction == FORWARD)
-            this->Position.z -= (velocity*8);
+        GLfloat velocity = this->MovementSpeed * deltaTime * 10;
+//        if (direction == FORWARD)
+//            this->Position.z -= (velocity*1.8);
 //        if (direction == BACKWARD)
-//            this->Position -= this->Front * velocity;
-        
-        return;
+//            this->Position.z += (velocity*1.8);
+//        
+//        return;
         
         if (direction == FORWARD)
             this->Position += this->Front * velocity;
@@ -115,13 +115,13 @@ public:
             this->Position += this->Right * velocity;
         //        this->Position.y = 0.0f;
         
-        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
+//        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
     }
     
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
     {
-        return;
+//        return;
         xoffset *= this->MouseSensitivity;
         yoffset *= this->MouseSensitivity;
         
@@ -166,11 +166,11 @@ private:
         // Also re-calculate the Right and Up vector
         this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         this->Up    = glm::normalize(glm::cross(this->Right, this->Front));
-        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
-        
-        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
-        
-        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
+//        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
+//        
+//        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
+//        
+//        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
         
     }
 };
