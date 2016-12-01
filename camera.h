@@ -15,7 +15,9 @@ enum Camera_Movement {
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    FRONT,
+    BACK
 };
 
 // Default camera values
@@ -52,10 +54,10 @@ public:
         this->Yaw = yaw;
         this->Pitch = pitch;
         this->updateCameraVectors();
-        this->Front = glm::vec3(-0.0619703, -0.789572, -0.610521);
-        this->Right = glm::vec3(0.994888, 0, -0.100985);
-        this->Up = glm::vec3(-0.0797349, 0.613658, -0.785535);
-        this->Position = glm::vec3(3.05157, 16.8589, 3.81323);
+        this->Front = glm::vec3(-0.0306749, -0.837354, -0.5458);
+        this->Right = glm::vec3(0.998424, 0, -0.0561131);
+        this->Up = glm::vec3(-0.0469865, 0.546662, -0.836034);
+        this->Position = glm::vec3(1.86539, 24.2274, 4.38784);
         /**
          Front-0.197481 -0.425782 -0.883012
          Right0.975892 0 -0.218253
@@ -76,6 +78,16 @@ public:
          Front-0.0619703 -0.789572 -0.610521
          Right0.994888 0 -0.100985
          Up-0.0797349 0.613658 -0.785535
+         
+         Position1.87205 23.8205 7.74261
+         Front-0.0417703 -0.760446 -0.648056
+         Right0.997929 0 -0.0643212
+         Up-0.0489128 0.649401 -0.758871
+         
+         Position1.86539 24.2274 4.38784
+         Front-0.0306749 -0.837354 -0.5458
+         Right0.998424 0 -0.0561131
+         Up-0.0469865 0.546662 -0.836034
          */
     }
     // Constructor with scalar values
@@ -98,12 +110,12 @@ public:
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
     {
         GLfloat velocity = this->MovementSpeed * deltaTime * 10;
-//        if (direction == FORWARD)
-//            this->Position.z -= (velocity*1.8);
-//        if (direction == BACKWARD)
-//            this->Position.z += (velocity*1.8);
-//        
-//        return;
+        if (direction == FRONT)
+            this->Position.z -= (velocity*1.8);
+        if (direction == BACK)
+            this->Position.z += (velocity*1.8);
+//
+        return;
         
         if (direction == FORWARD)
             this->Position += this->Front * velocity;
@@ -115,13 +127,13 @@ public:
             this->Position += this->Right * velocity;
         //        this->Position.y = 0.0f;
         
-//        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
+        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
     }
     
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
     {
-//        return;
+        return;
         xoffset *= this->MouseSensitivity;
         yoffset *= this->MouseSensitivity;
         
@@ -166,11 +178,11 @@ private:
         // Also re-calculate the Right and Up vector
         this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         this->Up    = glm::normalize(glm::cross(this->Right, this->Front));
-//        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
-//        
-//        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
-//        
-//        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
+        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
+//
+        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
+//
+        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
         
     }
 };

@@ -24,7 +24,7 @@ GLfloat lastX = 400, lastY = 300;
 GLboolean firstMouse = true;
 
 
-const GLint gameWidth = 500;
+const GLint gameWidth = 750;
 const GLint gameHeight = 800;
 
 void do_movement();
@@ -318,8 +318,8 @@ int main(int argc, const char * argv[]) {
         return -1;
     }
     // Load shaders (normal shader and light source shader)
-    Shader mainShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/shader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/shader.frag");
-    Shader objShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/objshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/objshader.frag");
+    Shader mainShader("shader.vs", "shader.frag");
+    Shader objShader("objshader.vs", "objshader.frag");
     // Set vectices
     glEnable(GL_DEPTH_TEST);
     GLfloat vertices[] = {
@@ -393,14 +393,14 @@ int main(int argc, const char * argv[]) {
     //              - No more than 5 normal lanes next to each other
     //              - Start with a safe lane
     
-    int lanesData[] = {0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
+    int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
     std::vector<int> lanes (lanesData, lanesData + sizeof(lanesData) / sizeof(int) );
     
     //Model loading test
     Model mainCharModel("/Users/ibrahimradwan/Desktop/obj/duck_obj.obj");
     Model carModel("/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
     
-    float objzpos = -1, objxpos = -4;
+    float objzpos = -3, objxpos = 0;
     
     while(!glfwWindowShouldClose(window))
     {
@@ -415,7 +415,6 @@ int main(int argc, const char * argv[]) {
             for (int i = 1; i < 52; i++) {
                 lanes.push_back(lanesData[i]);
             }
-            
         }
         //Check for arrows movement
         do_movement();
@@ -430,7 +429,8 @@ int main(int argc, const char * argv[]) {
         // Main Character Object drawing
         objShader.Use();
         glm::mat4 objview = camera.GetViewMatrix();
-        glm::mat4 objprojection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 100.0f);
+        
+        glm::mat4 objprojection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( objxpos, 0.0f, objzpos));
         objmodel = glm::rotate(objmodel, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -448,7 +448,7 @@ int main(int argc, const char * argv[]) {
         // Cars Objects drawing
         objShader.Use();
         glm::mat4 carview = camera.GetViewMatrix();
-        glm::mat4 carprojection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 100.0f);
+        glm::mat4 carprojection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f);
         //Draw cars
         GLint carviewLoc = glGetUniformLocation(objShader.Program, "view");
         GLint carprojectionLoc = glGetUniformLocation(objShader.Program, "projection");
@@ -461,7 +461,8 @@ int main(int argc, const char * argv[]) {
             carsZPos -=1;
             if(lanes[i] == 1){
                 glm::mat4 carmodel;
-                carmodel = glm::translate(carmodel, glm::vec3(25.0f, 0.9f, carsZPos));
+                //                carmodel = glm::translate(carmodel, glm::vec3(25.0f, 0.9f, carsZPos));
+                carmodel = glm::translate(carmodel, glm::vec3(0.0f, 0.9f, carsZPos));
                 carmodel = glm::rotate(carmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
                 carmodel = glm::scale(carmodel, glm::vec3(0.006f, 0.006f, 0.006f));
                 GLint carmodelLoc = glGetUniformLocation(objShader.Program, "model");
@@ -478,7 +479,7 @@ int main(int argc, const char * argv[]) {
         
         if(keys[GLFW_KEY_UP]){
             objzpos -= 0.1f;
-            //            camera.ProcessKeyboard(FORWARD, deltaTime);
+            //           camera.ProcessKeyboard(FORWARD, deltaTime);
         }
         if(keys[GLFW_KEY_DOWN]){
             objzpos += 0.1f;
@@ -498,7 +499,7 @@ int main(int argc, const char * argv[]) {
         glm::mat4 view;
         glm::mat4 projection;
         view = camera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f);
         
         GLint modelLoc = glGetUniformLocation(mainShader.Program, "model");
         GLint viewLoc = glGetUniformLocation(mainShader.Program, "view");
@@ -561,10 +562,10 @@ int main(int argc, const char * argv[]) {
 void do_movement()
 {
     
-    //    if(keys[GLFW_KEY_UP])
-    //        camera.ProcessKeyboard(FORWARD, deltaTime);
-    //    if(keys[GLFW_KEY_DOWN])
-    //        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if(keys[GLFW_KEY_UP])
+        camera.ProcessKeyboard(FRONT, deltaTime);
+    if(keys[GLFW_KEY_DOWN])
+        camera.ProcessKeyboard(BACK, deltaTime);
     
     if(keys[GLFW_KEY_W])
         camera.ProcessKeyboard(FORWARD, deltaTime);
