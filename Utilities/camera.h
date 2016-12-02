@@ -45,7 +45,7 @@ public:
     GLfloat MovementSpeed;
     GLfloat MouseSensitivity;
     GLfloat Zoom;
-    
+    bool disableCamera = false; // Set true to disable camera
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = YAW, GLfloat pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
     {
@@ -58,37 +58,6 @@ public:
         this->Right = glm::vec3(0.998424, 0, -0.0561131);
         this->Up = glm::vec3(-0.0469865, 0.546662, -0.836034);
         this->Position = glm::vec3(1.86539, 24.2274, 4.38784);
-        /**
-         Front-0.197481 -0.425782 -0.883012
-         Right0.975892 0 -0.218253
-         Up-0.0929283 0.904826 -0.415518
-         Position4.79858 7.19151 3.84198
-
-         Front-0.163805 -0.775287 -0.609998
-         Right0.965784 0 -0.259346
-         Up-0.201067 0.631609 -0.74876
-         
-         
-         Position1.50197 8.19151 0.944337
-         Front-0.0592109 -0.669549 -0.740405
-         Right0.996818 0 -0.0797165
-         Up-0.053374 0.742768 -0.667418
-         
-         Position3.05157 16.5589 3.91323
-         Front-0.0619703 -0.789572 -0.610521
-         Right0.994888 0 -0.100985
-         Up-0.0797349 0.613658 -0.785535
-         
-         Position1.87205 23.8205 7.74261
-         Front-0.0417703 -0.760446 -0.648056
-         Right0.997929 0 -0.0643212
-         Up-0.0489128 0.649401 -0.758871
-         
-         Position1.86539 24.2274 4.38784
-         Front-0.0306749 -0.837354 -0.5458
-         Right0.998424 0 -0.0561131
-         Up-0.0469865 0.546662 -0.836034
-         */
     }
     // Constructor with scalar values
     Camera(GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
@@ -109,13 +78,14 @@ public:
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
     {
-        GLfloat velocity = this->MovementSpeed * deltaTime * 10;
+        GLfloat velocity = this->MovementSpeed * deltaTime;
         if (direction == FRONT)
-            this->Position.z -= (velocity*1.8);
+            this->Position.z -= (velocity);
         if (direction == BACK)
-            this->Position.z += (velocity*1.8);
-//
-//        return;
+            this->Position.z += (velocity);
+        
+        if(disableCamera)
+            return;
         
         if (direction == FORWARD)
             this->Position += this->Front * velocity;
@@ -133,7 +103,9 @@ public:
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
     {
-//        return;
+        if(disableCamera)
+            return;
+
         xoffset *= this->MouseSensitivity;
         yoffset *= this->MouseSensitivity;
         
@@ -156,7 +128,9 @@ public:
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     void ProcessMouseScroll(GLfloat yoffset)
     {
-        return;
+        if(disableCamera)
+            return;
+
         if (this->Zoom >= 1.0f && this->Zoom <= 45.0f)
             this->Zoom -= yoffset;
         if (this->Zoom <= 1.0f)
@@ -179,9 +153,9 @@ private:
         this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         this->Up    = glm::normalize(glm::cross(this->Right, this->Front));
         std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
-//
+        //
         std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
-//
+        //
         std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
         
     }

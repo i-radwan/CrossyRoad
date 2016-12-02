@@ -15,7 +15,7 @@ public:
         objmodel = glm::translate(objmodel, glm::vec3( this->penX, this->penY, this->penZ));
         objmodel = glm::rotate(objmodel, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objmodel = glm::scale(objmodel, glm::vec3(0.15f, 0.15f, 0.15f));
+        objmodel = glm::scale(objmodel, glm::vec3(0.12f, 0.12f, 0.12f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
         GLint objviewLoc = glGetUniformLocation(shader.Program, "view");
         GLint objprojectionLoc = glGetUniformLocation(shader.Program, "projection");

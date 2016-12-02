@@ -7,13 +7,13 @@ public:
     Car(Shader shader, GLchar* modelLink):shader(shader){
         carModel = new Model(modelLink);
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float penX, float penY, float penZ){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ){
         shader.Use();
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
-        objmodel = glm::translate(objmodel, glm::vec3( penX, penY, penZ));
+        objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ - 0.25f));
         objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        objmodel = glm::scale(objmodel, glm::vec3(0.006f, 0.006f, 0.006f)); // ToDo size up
+        objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
         GLint objviewLoc = glGetUniformLocation(shader.Program, "view");
         GLint objprojectionLoc = glGetUniformLocation(shader.Program, "projection");

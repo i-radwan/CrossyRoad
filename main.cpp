@@ -78,7 +78,7 @@ int main(int argc, const char * argv[]) {
         
         // Sart drawing
         // Penguin drawing
-        //Check for arrows movement
+        //Check for arrows movement ToDo fix diagonal movement
         if(graphicsUtilities.do_movement(deltaTime) == FORWARD_MOVEMENT){
             penguin.setPenZ(penguin.getPenZ() - 0.1f);
         } else if (graphicsUtilities.do_movement(deltaTime) == BACKWARD_MOVEMENT){
@@ -91,17 +91,23 @@ int main(int argc, const char * argv[]) {
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f);
         
         //Cars Objects drawing (ToDo, create car object and set its speed, start position, texture, ..etc)
-        float carsZPos = 0;
-        for(GLuint i = 0; i < lanes.size(); i++)
+        float carsZPos = -5.3;
+        // Igonre first 5 safe lanes
+        for(GLuint i = 5; i < lanes.size(); i++)
         {
-            carsZPos -=1;
             if(lanes[i] == 1){
-                car.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f, 0, 0.9f, carsZPos);
+                car.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f, 0, 1.3, carsZPos);
+           }
+            if((i < lanes.size()-1 && lanes[i] == 1 && lanes[i + 1] == 0) || (i < lanes.size()-1 && lanes[i] == 0 && lanes[i + 1] == 1)){
+                carsZPos -=1.5;
             }
-            if(i < lanes.size()-1 && lanes[i] == 1 && lanes[i+1] == 1){
-                carsZPos -= 1.2;
+            else{
+                carsZPos -= 1;
             }
             
+            if(i < lanes.size()-1 && lanes[i] == 1 && lanes[i+1] == 1){
+                carsZPos -= 1.1;
+            }
         }
         
         // Draw the scene
