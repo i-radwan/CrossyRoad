@@ -115,7 +115,7 @@ public:
         if (direction == BACK)
             this->Position.z += (velocity*1.8);
 //
-        return;
+//        return;
         
         if (direction == FORWARD)
             this->Position += this->Front * velocity;
@@ -133,7 +133,7 @@ public:
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
     void ProcessMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean constrainPitch = true)
     {
-        return;
+//        return;
         xoffset *= this->MouseSensitivity;
         yoffset *= this->MouseSensitivity;
         
