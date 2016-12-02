@@ -42,7 +42,7 @@ int main(int argc, const char * argv[]) {
     // Load gamescene
     GameScene gameScene(mainShader);
     // Load MODELS
-    Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/untitled2.obj");
+    Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/penguin.obj");
     penguin.setPenPosition(0, 1.4f, -3.0); // Set initial posisiton
     Car car(carShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
     
