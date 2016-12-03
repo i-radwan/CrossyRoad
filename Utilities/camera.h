@@ -95,9 +95,8 @@ public:
             this->Position -= this->Right * velocity;
         if (direction == RIGHT)
             this->Position += this->Right * velocity;
-        //        this->Position.y = 0.0f;
         
-        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
+//        std::cout<<"Position" <<this->Position.x<<" " << this->Position.y << " " << this->Position.z << std::endl;
     }
     
     // Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -152,11 +151,11 @@ private:
         // Also re-calculate the Right and Up vector
         this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         this->Up    = glm::normalize(glm::cross(this->Right, this->Front));
-        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
-        //
-        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
-        //
-        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
+//        std::cout<<"Front" <<this->Front.x<<" " << this->Front.y << " " << this->Front.z << std::endl;
+        
+//        std::cout<<"Right" <<this->Right.x<<" " << this->Right.y << " " << this->Right.z << std::endl;
+        
+//        std::cout<<"Up" <<this->Up.x<<" " << this->Up.y << " " << this->Up.z << std::endl;
         
     }
 };

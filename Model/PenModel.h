@@ -1,29 +1,33 @@
-#include "Mesh.h"
+#include "PenMesh.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <utility>
+using namespace std;
+vector<Texture> textures_loaded;
 
-vector<Texture> all_loaded_textures;
-
-class Model
+class PenModel
 {
 public:
     /*  Functions   */
     // Constructor, expects a filepath to a 3D model.
-    Model(GLchar* path)
+    PenModel(GLchar* path)
     {
         this->loadModel(path);
     }
     
     // Draws the model, and thus all its meshes
-    void Draw(Shader shader)
+    void Draw(Shader shader, GLuint frameCount, glm::mat4 objmodel, bool moving)
     {
         for(GLuint i = 0; i < this->meshes.size(); i++)
-            this->meshes[i].Draw(shader);
+            this->meshes[i].Draw(shader, this->modelAnimations, frameCount, objmodel, moving);
     }
-    
+    vector<pair< string, vector<animationData> > > getModelAnimations(){return this->modelAnimations;}
 private:
     /*  Model Data  */
-    vector<Mesh> meshes;
+    vector<PenMesh> meshes;
     string directory;
-    
+    vector<pair< string, vector<animationData> > > modelAnimations; // animation storage
     /*  Functions   */
     // Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string path)
@@ -41,6 +45,50 @@ private:
         this->directory = path.substr(0, path.find_last_of('/'));
         // Process ASSIMP's root node recursively
         this->processNode(scene->mRootNode, scene);
+        
+        // Get animations
+        for (int i = 0; i<scene->mNumAnimations; i++) {
+            aiAnimation* animation = scene->mAnimations[i];
+
+            string nodeName =animation->mName.C_Str();
+            cout << "Animation: " << animation->mName.C_Str() << " " << animation->mDuration << endl;
+            
+            for (int j = 0; j< animation->mNumChannels; j++) {
+                aiNodeAnim* nodeAnimation = animation->mChannels[j];
+                cout << "Node: " << nodeAnimation->mNodeName.C_Str() << endl;
+                
+                string nodeName = nodeAnimation->mNodeName.C_Str() ;
+                vector<animationData> animData(nodeAnimation->mNumPositionKeys);
+            
+                for (int k = 0; k < nodeAnimation->mNumPositionKeys; k++) {
+                    aiVectorKey position = nodeAnimation->mPositionKeys[k];
+                    animData[k].time = position.mTime;
+                    animData[k].position.x = position.mValue.x;
+                    animData[k].position.y = position.mValue.y;
+                    animData[k].position.z = position.mValue.z;
+                    cout << "Position: Time-> " << position.mTime << " x: " << position.mValue.x <<  " y: " << position.mValue.y << " z: "<<  position.mValue.z << endl;
+                }
+                for (int k = 0; k < nodeAnimation->mNumRotationKeys; k++) {
+                    aiQuatKey rotating = nodeAnimation->mRotationKeys[k];
+                    animData[k].rotation.x = rotating.mValue.x;
+                    animData[k].rotation.y = rotating.mValue.y;
+                    animData[k].rotation.z = rotating.mValue.z;
+                    cout << "Rotating: Time-> " << rotating.mTime << " x: " << rotating.mValue.x <<  " y: " << rotating.mValue.y << " z: " << rotating.mValue.z<< " w: " << rotating.mValue.w << endl;
+                }
+                for (int k = 0; k < nodeAnimation->mNumScalingKeys; k++) {
+                    aiVectorKey scale = nodeAnimation->mScalingKeys[k];
+                    animData[k].scaling.x = scale.mValue.x;
+                    animData[k].scaling.y = scale.mValue.y;
+                    animData[k].scaling.z = scale.mValue.z;
+                    cout << "Scale: Time-> " << scale.mTime << " x: " << scale.mValue.x <<  " y: "<<  scale.mValue.y << " z: "<<  scale.mValue.z << endl;
+                }
+                modelAnimations.push_back(make_pair(nodeName, animData));
+                cout << endl<<endl;
+            }
+            cout << endl<<endl;
+            cout << endl<<endl;
+        }
+        
     }
     
     // Processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
@@ -52,7 +100,7 @@ private:
             // The node object only contains indices to index the actual objects in the scene.
             // The scene contains all the data, node is just to keep stuff organized (like relations between nodes).
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            this->meshes.push_back(this->processMesh(mesh, scene));
+            this->meshes.push_back(this->processMesh(mesh, scene, node->mName.C_Str()));
         }
         // After we've processed all of the meshes (if any) we then recursively process each of the children nodes
         for(GLuint i = 0; i < node->mNumChildren; i++)
@@ -62,7 +110,7 @@ private:
         
     }
     
-    Mesh processMesh(aiMesh* mesh, const aiScene* scene)
+    PenMesh processMesh(aiMesh* mesh, const aiScene* scene, string nodeName)
     {
         // Data to fill
         vector<Vertex> vertices;
@@ -120,23 +168,23 @@ private:
             aiColor4D diffuse;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
             objColor.diffColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-            std::cout << "Mat. Diff: " << diffuse.r << " " << diffuse.g << " " << diffuse.b << " " << diffuse.a << endl;
+            //            std::cout << "Mat. Diff: " << diffuse.r << " " << diffuse.g << " " << diffuse.b << " " << diffuse.a << endl;
             aiColor4D ambient;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient);
             objColor.ambiColor = glm::vec4(ambient.r, ambient.g, ambient.b, ambient.a);
             
-            std::cout << "Mat. Amb: " << ambient.r << " " << ambient.g << " " << ambient.b << " " << ambient.a << endl;
+            //            std::cout << "Mat. Amb: " << ambient.r << " " << ambient.g << " " << ambient.b << " " << ambient.a << endl;
             aiColor4D specular;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular);
             objColor.specColor = glm::vec4(specular.r, specular.g, specular.b, specular.a);
             
-            std::cout << "Mat. Spec: " << specular.r << " " << specular.g << " " << specular.b << " " << specular.a << endl;
+            //            std::cout << "Mat. Spec: " << specular.r << " " << specular.g << " " << specular.b << " " << specular.a << endl;
             
             aiColor4D emissive;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_EMISSIVE, &emissive);
             objColor.emiColor = glm::vec4(emissive.r, emissive.g, emissive.b, emissive.a);
             
-            std::cout << "Mat. Emi: " << emissive.r << " " << emissive.g << " " << emissive.b << " " << emissive.a << endl;
+            //            std::cout << "Mat. Emi: " << emissive.r << " " << emissive.g << " " << emissive.b << " " << emissive.a << endl;
             
             // 1. Diffuse maps
             vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
@@ -147,7 +195,8 @@ private:
         }
         
         // Return a mesh object created from the extracted mesh data
-        return Mesh(vertices, indices, textures, objColor);
+        
+        return PenMesh(vertices, indices, textures, objColor, nodeName);
     }
     
     // Checks all material textures of a given type and loads the textures if they're not loaded yet.
@@ -161,22 +210,22 @@ private:
             aiString str;
             mat->GetTexture(type, i, &str);
             GLboolean skip = false;
-            for(GLuint j = 0; j < all_loaded_textures.size(); j++)
+            for(GLuint j = 0; j < textures_loaded.size(); j++)
             {
-                if(all_loaded_textures[j].path == str)
+                if(textures_loaded[j].path == str)
                 {
-                    textures.push_back(all_loaded_textures[j]);
+                    textures.push_back(textures_loaded[j]);
                     skip = true;
                     break;
                 } }
             if(!skip)
-            { // If texture hasnÕt been loaded already, load it
+            { // If texture hasnâ€™t been loaded already, load it
                 Texture texture;
                 texture.id = TextureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
                 texture.path = str;
                 textures.push_back(texture);
-                all_loaded_textures.push_back(texture); // Add to loaded  textures
+                textures_loaded.push_back(texture); // Add to loaded  textures
                 
             }
         }
@@ -207,3 +256,4 @@ private:
         return textureID;
     }
 };
+

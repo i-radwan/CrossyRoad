@@ -99,7 +99,7 @@ public:
         
         return 0;
     }
-    penguinMovement do_movement(GLfloat deltaTime)
+    penguinMovement do_movement(GLfloat deltaTime, bool& movingForward, bool& movingBackward, bool& movingRight, bool& movingLeft)
     {
         if(keys[GLFW_KEY_Q])
             camera->ProcessKeyboard(FRONT, deltaTime);
@@ -114,13 +114,13 @@ public:
         if(keys[GLFW_KEY_D])
             camera->ProcessKeyboard(RIGHT, deltaTime);
         if(keys[GLFW_KEY_UP])
-            return FORWARD_MOVEMENT;
+            movingForward = true;
         if(keys[GLFW_KEY_DOWN])
-            return BACKWARD_MOVEMENT;
+            movingBackward = true;
         if(keys[GLFW_KEY_RIGHT])
-            return RIGHT_MOVEMENT;
+            movingRight = true;
         if(keys[GLFW_KEY_LEFT])
-            return LEFT_MOVEMENT;
+            movingLeft = true;
         return NO_MOVEMENT;
     }
     void bindCube(GLuint & VBO, GLuint & VAO){

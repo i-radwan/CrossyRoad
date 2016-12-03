@@ -16,7 +16,7 @@ public:
         vector<int> tmpLanes (lanesData, lanesData + sizeof(lanesData) / sizeof(int) );
         lanes = tmpLanes;
     }
-    static void addMoreLanes(vector<int>& lanes){
+    static void addMoreLanes(vector<int>& lanes) {
         int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
         for (int i = 1; i < 52; i++) {
             lanes.push_back(lanesData[i]);

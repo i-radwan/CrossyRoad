@@ -5,11 +5,11 @@ using namespace std;
 class Penguin{
 public:
     Penguin(Shader shader, GLchar* modelLink):shader(shader){
-        penguinModel = new Model(modelLink);
+        penguinModel = new PenModel(modelLink);
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint frameCount, bool moving){
         shader.Use();
-        
+        // Check for animations
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( this->penX, this->penY, this->penZ));
@@ -22,7 +22,7 @@ public:
         glUniformMatrix4fv(objviewLoc, 1, GL_FALSE, glm::value_ptr(cameraViewMat));
         glUniformMatrix4fv(objprojectionLoc, 1, GL_FALSE, glm::value_ptr(objprojection));
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
-        penguinModel->Draw(shader);
+        penguinModel->Draw(shader, frameCount, objmodel, moving);
     }
     void setPenPosition(float penX, float penY, float penZ){
         this->penX = penX;
@@ -41,9 +41,11 @@ public:
     float getPenX(){return this->penX;}
     float getPenY(){return this->penY;}
     float getPenZ(){return this->penZ;}
+    PenModel* getPenguinMode(){return this->penguinModel;}
+    
 private:
     Shader shader;
-    Model* penguinModel;
+    PenModel* penguinModel;
     float penX, penY, penZ;
     
 };

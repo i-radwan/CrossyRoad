@@ -3,24 +3,53 @@
 #include "../Utilities/shaders.h"
 
 using namespace std;
-
-class Mesh {
+struct Vertex {
+    glm::vec3 Position;
+    glm::vec3 Normal;
+    glm::vec2 TexCoords;
+};
+struct Texture {
+    GLuint id;
+    string type;
+    aiString path;
+};
+struct ObjColor {
+    glm::vec4 diffColor;
+    glm::vec4 specColor;
+    glm::vec4 ambiColor;
+    glm::vec4 emiColor;
+};
+struct animationData {
+    GLfloat time;
+    struct Position{
+        GLfloat x, y, z;
+    }position;
+    struct Rotation{
+        GLfloat x, y, z, w;
+    }rotation;
+    struct Scaling{
+        GLfloat x, y, z;
+    }scaling;
+};
+class PenMesh {
 public:
     /* Mesh Data */
     vector<Vertex> vertices;
     vector<GLuint> indices;
     vector<Texture> textures;
     ObjColor colors;
+    string name;
     /* Functions */
-    Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, ObjColor colors)
+    PenMesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures, ObjColor colors, string name)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
         this->colors= colors;
+        this->name = name;
         this->setupMesh();
     }
-    void Draw(Shader shader)
+    void Draw(Shader shader, vector<pair< string, vector<animationData> > > anim, GLuint frameCount,  glm::mat4 objmodel, bool moving)
     {
         GLuint diffuseNr = 1;
         GLuint specularNr = 1;
@@ -48,6 +77,19 @@ public:
         
         glUniform4f(glGetUniformLocation(shader.Program, "emiColor"), this->colors.emiColor.r,this->colors.emiColor.g,this->colors.emiColor.b,this->colors.emiColor.a);
         
+        // Before drawing the mesh get from anim vector the animation value corrsponding to the node name and current framCount and apply these changes to the objmodel mat4 and then set the uniform into the shader and then draw
+        if(moving)
+            for (int i = 0; i < anim.size(); i++) {
+                if(anim[i].first == this->name){
+                    animationData animationdata =  anim[i].second[frameCount];
+                    //                objmodel = glm::rotate(objmodel, (animationdata.rotation.x), glm::vec3(1.0,0,0));
+                    //                objmodel = glm::rotate(objmodel, (animationdata.rotation.y), glm::vec3(0,1.0,0));
+                    objmodel = glm::rotate(objmodel, (animationdata.rotation.z * 3), glm::vec3(0,0,1.0));
+                    GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
+                    glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
+                    break;
+                }
+            }
         glActiveTexture(GL_TEXTURE0);
         // Draw mesh
         glBindVertexArray(this->VAO);
@@ -89,3 +131,4 @@ private:
         
     }
 };
+
