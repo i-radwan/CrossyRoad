@@ -90,7 +90,7 @@ public:
         }
         lanesArray.clear();
         lanesArray = newLanesArray;
-        newstart = lanesArray[0].startPos+1.5;
+        newstart = lanesArray[0].startPos+1.55;
         firstLanesSet= false;
     }
     
