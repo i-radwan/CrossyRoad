@@ -120,23 +120,23 @@ private:
             aiColor4D diffuse;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
             objColor.diffColor = glm::vec4(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-            std::cout << "Mat. Diff: " << diffuse.r << " " << diffuse.g << " " << diffuse.b << " " << diffuse.a << endl;
+//            std::cout << "Mat. Diff: " << diffuse.r << " " << diffuse.g << " " << diffuse.b << " " << diffuse.a << endl;
             aiColor4D ambient;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_AMBIENT, &ambient);
             objColor.ambiColor = glm::vec4(ambient.r, ambient.g, ambient.b, ambient.a);
             
-            std::cout << "Mat. Amb: " << ambient.r << " " << ambient.g << " " << ambient.b << " " << ambient.a << endl;
+//            std::cout << "Mat. Amb: " << ambient.r << " " << ambient.g << " " << ambient.b << " " << ambient.a << endl;
             aiColor4D specular;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_SPECULAR, &specular);
             objColor.specColor = glm::vec4(specular.r, specular.g, specular.b, specular.a);
             
-            std::cout << "Mat. Spec: " << specular.r << " " << specular.g << " " << specular.b << " " << specular.a << endl;
+//            std::cout << "Mat. Spec: " << specular.r << " " << specular.g << " " << specular.b << " " << specular.a << endl;
             
             aiColor4D emissive;
             aiGetMaterialColor(material, AI_MATKEY_COLOR_EMISSIVE, &emissive);
             objColor.emiColor = glm::vec4(emissive.r, emissive.g, emissive.b, emissive.a);
             
-            std::cout << "Mat. Emi: " << emissive.r << " " << emissive.g << " " << emissive.b << " " << emissive.a << endl;
+//            std::cout << "Mat. Emi: " << emissive.r << " " << emissive.g << " " << emissive.b << " " << emissive.a << endl;
             
             // 1. Diffuse maps
             vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");

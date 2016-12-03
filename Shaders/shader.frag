@@ -8,7 +8,14 @@ in float IsNormalLaneBeforeNormalLane;
 in float xposition;
 out vec4 color;
 
+uniform vec3 lightColor;
+
 void main() {
+    
+    //Ambient strength * light Color to get the final light falling on the object
+    float ambientStrength = 1.0f;
+    vec3 ambient = ambientStrength * lightColor;
+    
     vec3 originalColor = vec3(0.28627f, 0.3098f, 0.37254f);
     if (safeland == 1.0f && IsSafeLaneAfterSafeLane == 0.0f){
         originalColor =vec3(0.635f, 0.827450f, 0.34901f);
@@ -29,5 +36,6 @@ void main() {
         originalColor = vec3(0.443137f, 0.47843f, 0.5725f);
     }
     
-    color = vec4(originalColor, 1.0f);
+    vec3 result = (ambient) * originalColor;
+    color = vec4(result, 1.0f);
 }

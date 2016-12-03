@@ -9,7 +9,10 @@ public:
     }
     void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint frameCount, bool moving){
         shader.Use();
-        // Check for animations
+        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( this->penX, this->penY, this->penZ));
@@ -23,6 +26,22 @@ public:
         glUniformMatrix4fv(objprojectionLoc, 1, GL_FALSE, glm::value_ptr(objprojection));
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
         penguinModel->Draw(shader, frameCount, objmodel, moving);
+    }
+    void move(bool movingForward, bool movingBackward, bool movingRight, bool movingLeft){
+        
+        if(movingForward){
+            setPenZ(getPenZ() - 0.1f);
+        }
+        if (movingBackward){
+            setPenZ(getPenZ() + 0.1f);
+        }
+        if (movingRight){
+            setPenX(getPenX() + 0.1f);
+        }
+        if (movingLeft){
+            setPenX(getPenX() - 0.1f);
+        }
+        
     }
     void setPenPosition(float penX, float penY, float penZ){
         this->penX = penX;

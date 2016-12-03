@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+
 using namespace std;
 vector<Texture> textures_loaded;
 
@@ -27,6 +28,7 @@ private:
     /*  Model Data  */
     vector<PenMesh> meshes;
     string directory;
+    
     vector<pair< string, vector<animationData> > > modelAnimations; // animation storage
     /*  Functions   */
     // Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.

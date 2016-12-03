@@ -8,6 +8,9 @@ public:
     }
     void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<int> lanes){
         shader.Use();
+        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         

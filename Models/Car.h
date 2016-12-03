@@ -10,6 +10,10 @@ public:
     }
     void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ){
         shader.Use();
+        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ - 0.25f));

@@ -81,24 +81,11 @@ int main(int argc, const char * argv[]) {
         //Check for arrows movement ToDo fix diagonal movement
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-        if(movingForward){
-            penguin.setPenZ(penguin.getPenZ() - 0.1f);
-        }
-        if (movingBackward){
-            penguin.setPenZ(penguin.getPenZ() + 0.1f);
-        }
-        if (movingRight){
-            penguin.setPenX(penguin.getPenX() + 0.1f);
-        }
-        if (movingLeft){
-            penguin.setPenX(penguin.getPenX() - 0.1f);
-        }
-        
+        penguin.move(movingForward, movingBackward, movingRight, movingLeft);
         // penguin animations
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward));
         
         
-        /*
         //Cars Objects drawing (ToDo, create car object and set its speed, start position, texture, ..etc)
         float carsZPos = -5.3;
         // Igonre first 5 safe lanes
@@ -106,7 +93,7 @@ int main(int argc, const char * argv[]) {
         {
             if(lanes[i] == 1){
                 car.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f, 0, 1.3, carsZPos);
-           }
+            }
             // Z operations
             if((i < lanes.size()-1 && lanes[i] == 1 && lanes[i + 1] == 0) || (i < lanes.size()-1 && lanes[i] == 0 && lanes[i + 1] == 1)){
                 carsZPos -=1.5;
@@ -119,7 +106,6 @@ int main(int argc, const char * argv[]) {
                 carsZPos -= 1.1;
             }
         }
-        */
         // Draw the scene
         gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanes);
         
