@@ -27,19 +27,30 @@ public:
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
         penguinModel->Draw(shader, frameCount, objmodel, moving);
     }
-    void move(bool movingForward, bool movingBackward, bool movingRight, bool movingLeft){
-        
+    void move(bool movingForward, bool movingBackward, bool movingRight, bool movingLeft, Camera &camera, GLfloat deltaTime, float startPos){
+        deltaTime*=50;
         if(movingForward){
-            setPenZ(getPenZ() - 0.1f);
+            setPenZ(getPenZ() - 0.1f*deltaTime);
+            glm::vec3 v(0,0,-0.1*deltaTime);
+            camera.updateCameraPos(v);
         }
         if (movingBackward){
-            setPenZ(getPenZ() + 0.1f);
+            if(getPenZ() <= startPos - 2){
+                setPenZ(getPenZ() + 0.1f*deltaTime);
+                glm::vec3 v(0,0,0.1*deltaTime);
+                camera.updateCameraPos(v);
+            }
         }
-        if (movingRight){
-            setPenX(getPenX() + 0.1f);
+        if (movingRight && getPenX() < 9.5){
+            setPenX(getPenX() + 0.1f*deltaTime);
+            //glm::vec3 v(-0.1,0,0);
+            //camera.updateCameraPos(v);
+            
         }
-        if (movingLeft){
-            setPenX(getPenX() - 0.1f);
+        if (movingLeft && getPenX() > -7){
+            setPenX(getPenX() - 0.1f*deltaTime);
+            //glm::vec3 v(0.1,0,0);
+            //camera.updateCameraPos(v);            
         }
         
     }

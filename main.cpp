@@ -52,11 +52,19 @@ int main(int argc, const char * argv[]) {
     graphicsUtilities.bindCube(VBO, VAO);
     
     // Generate lanes
-    vector<int> lanes;
-    Utilities::generateLanesAlgorithm(lanes);
+    vector<lane> lanesArray;
+    Utilities::generateLanesAlgorithm(lanesArray);
+    float newStart = -1.3;
     
+    float*carsXPosition=new float[lanesArray.size()];
+    for(int i = 0; i < lanesArray.size(); i++){
+        carsXPosition[i] = 12;
+    }
+    int varSpeed=1;
+    bool firstLanesSet = true;
     // Some variables for game logic go here::
     GLuint frameCount = 0;
+    GLfloat laneAccumulatedSpeedAccelaration = 0;
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents(); // Check for keyboard or mouse events
@@ -66,10 +74,6 @@ int main(int argc, const char * argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         
-        // Check if lanes generation needed
-        if (camera.Position.z < (int)(-1*lanes.size())){
-            Utilities::addMoreLanes(lanes);
-        }
         
         // Clear screen with certain background color
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
@@ -81,34 +85,67 @@ int main(int argc, const char * argv[]) {
         //Check for arrows movement ToDo fix diagonal movement
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-        penguin.move(movingForward, movingBackward, movingRight, movingLeft);
+        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart);
         // penguin animations
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward));
         
         
         //Cars Objects drawing (ToDo, create car object and set its speed, start position, texture, ..etc)
-        float carsZPos = -5.3;
-        // Igonre first 5 safe lanes
-        for(GLuint i = 5; i < lanes.size(); i++)
+        float carsZPos = ((firstLanesSet) ? (newStart-5) : newStart+0.5);
+        
+        for(GLuint i = ((firstLanesSet)? 5:0); i < lanesArray.size(); i++)
         {
-            if(lanes[i] == 1){
-                car.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f, 0, 1.3, carsZPos);
+            if(lanesArray[i].type == 1){
+                car.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth, 0.1f, 1000.0f, carsXPosition[i], 1.3, carsZPos);
             }
             // Z operations
-            if((i < lanes.size()-1 && lanes[i] == 1 && lanes[i + 1] == 0) || (i < lanes.size()-1 && lanes[i] == 0 && lanes[i + 1] == 1)){
+            if((i < lanesArray.size()-1 && lanesArray[i].type == 1 && lanesArray[i + 1].type == 0) || (i < lanesArray.size()-1 && lanesArray[i].type == 0 && lanesArray[i + 1].type == 1)){
                 carsZPos -=1.5;
             }
             else{
                 carsZPos -= 1;
             }
             
-            if(i < lanes.size()-1 && lanes[i] == 1 && lanes[i+1] == 1){
+            if(i < lanesArray.size()-1 && lanesArray[i].type == 1 && lanesArray[i+1].type == 1){
                 carsZPos -= 1.1;
             }
         }
-        // Draw the scene
-        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanes);
         
+        // Set speed
+        int sp =laneAccumulatedSpeedAccelaration;
+        for(int i = 0; i < lanesArray.size(); i++)
+        {
+            // Rotate cars
+            if(carsXPosition[i]<-25)
+            {carsXPosition[i]=25;}
+            
+            if((varSpeed%2)==0)
+            {
+                carsXPosition[i]-=0.01;
+            }
+            if((varSpeed%3)==0)
+            {
+                carsXPosition[i]-=0.02;
+            }
+            if((varSpeed%5)==0)
+            {
+                carsXPosition[i]-=0.025;
+            }
+            carsXPosition[i]-= (sp)*0.01;
+            sp++;
+            varSpeed++;
+        }
+        
+        // Draw the scene
+        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart);
+        
+        cout << lanesArray[39].startPos << " " << penguin.getPenZ() <<endl;
+        cout << newStart << endl;
+        // Check if lanes generation needed
+        if (penguin.getPenZ() < lanesArray[34].startPos){
+            Utilities::addMoreLanes(lanesArray, newStart, firstLanesSet, carsXPosition);
+            laneAccumulatedSpeedAccelaration += 34;
+        }
         frameCount++;
         if(frameCount >= penguin.getPenguinMode()->getModelAnimations()[0].second.size()){
             frameCount = 0;
@@ -120,5 +157,4 @@ int main(int argc, const char * argv[]) {
     glfwTerminate();
     return 0;
 }
-
 

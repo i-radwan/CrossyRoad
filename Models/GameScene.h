@@ -6,7 +6,7 @@ class GameScene{
 public:
     GameScene(Shader shader):shader(shader){
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<int> lanes){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart){
         shader.Use();
         glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
         GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
@@ -28,36 +28,38 @@ public:
         glBindVertexArray(cubeAVO);
         
         //Draw lanes
-        float zpos = 0;
-        for(GLuint i = 0; i < lanes.size(); i++)
+        float zpos = newStart;
+        for(GLuint i = 0; i < lanesArray.size(); i++)
         {
             glm::mat4 model;
             model = glm::translate(model, glm::vec3( 0.0f, 0.0f, zpos));
             
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-            if(lanes[i] == 1){
+            if(lanesArray[i].type == 1){
                 model = glm::scale(model, glm::vec3(1.0f, 1.0f, 2.0f));
             }
-            if(lanes[i] == 0){
+            if(lanesArray[i].type == 0){
                 glUniform1f(isSafeLaneLoc, 1.0f);
             }
-            if(i > 0 && lanes[i] == 0 && lanes[i-1] == 0){
+            if(i > 0 && lanesArray[i].type == 0 && lanesArray[i-1].type == 0){
                 glUniform1f(isSafeLaneAfterSafeLane, 1.0f);
             }
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
             glDrawArrays(GL_TRIANGLES, 0, 36);
             
-           
+            
             // Z operations
-            if((i < lanes.size()-1 && lanes[i] == 1 && lanes[i + 1] == 0) || (i < lanes.size()-1 && lanes[i] == 0 && lanes[i + 1] == 1)){
+            if((i < lanesArray.size()-1 && lanesArray[i].type == 1 && lanesArray[i+1].type == 0) || (i < lanesArray.size()-1 && lanesArray[i].type == 0 && lanesArray[i+1].type == 1)){
                 zpos -=1.5;
             }
             else{
                 zpos -= 1;
             }
-                        
+            if(!lanesArray[i].drawnBefore)
+                lanesArray[i].startPos =zpos,lanesArray[i].drawnBefore = 1;
+            
             // Draw lane separator
-            if(i < lanes.size()-1 && lanes[i] == 1 && lanes[i+1] == 1){
+            if(i < lanesArray.size()-1 && lanesArray[i].type == 1 && lanesArray[i+1].type == 1){
                 zpos -= 0.05;
                 glm::mat4 model;
                 model = glm::translate(model, glm::vec3( 0.0f, 0.0f, zpos));
