@@ -9,9 +9,15 @@ public:
     }
     void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint frameCount, bool moving){
         shader.Use();
-        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        
+        // Use cooresponding shader when setting uniforms/drawing objects
+        glm::vec3 lightPos = glm::vec3(this->getPenX(), 10.0f, this->getPenZ() -3);
+        glm::vec3 lightCol = glm::vec3(0.55f, 0.55f, 0.55f);
         GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        GLint lightPosLoc    = glGetUniformLocation(shader.Program, "lightPos");
         glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        glUniform3f(lightPosLoc,    lightPos.x, lightPos.y, lightPos.z);
+        
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;

@@ -6,11 +6,11 @@ class GameScene{
 public:
     GameScene(Shader shader):shader(shader){
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, float penguinZpos, float penguinXpos){
         shader.Use();
-        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
-        GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
-        glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        
+        
+        float zpos = newStart;
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         
@@ -22,13 +22,22 @@ public:
         GLint isNormalLaneBeforeNormalLane = glGetUniformLocation(shader.Program, "isNormalLaneBeforeNormalLane");
         
         
+        // Use cooresponding shader when setting uniforms/drawing objects
+        glm::vec3 lightPos = glm::vec3(penguinXpos, 10.0f, penguinZpos-3);
+        glm::vec3 lightCol = glm::vec3(0.55f, 0.55f, 0.55f);
+        GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        GLint lightPosLoc    = glGetUniformLocation(shader.Program, "lightPos");
+        glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        glUniform3f(lightPosLoc,    lightPos.x, lightPos.y, lightPos.z);
+        
+        
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cameraViewMat));
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(objprojection));
         
         glBindVertexArray(cubeAVO);
         
         //Draw lanes
-        float zpos = newStart;
+        
         for(GLuint i = 0; i < lanesArray.size(); i++)
         {
             glm::mat4 model;

@@ -2,17 +2,29 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "../Model/Model.h"
+
 using namespace std;
 class Car{
 public:
     Car(Shader shader, GLchar* modelLink):shader(shader){
         carModel = new Model(modelLink);
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ, float penguinZpos, float penguinXpos){
         shader.Use();
-        glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
+        
+        // Use cooresponding shader when setting uniforms/drawing objects
+        glm::vec3 lightPos = glm::vec3(penguinXpos, 4.0f, penguinZpos +3);
+        glm::vec3 lightCol = glm::vec3(0.55f, 0.55f, 0.55f);
         GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
+        GLint lightPosLoc    = glGetUniformLocation(shader.Program, "lightPos");
+        GLint factorLoc = glGetUniformLocation(shader.Program, "factor");
         glUniform3f(lightColorLoc, lightCol.x, lightCol.y, lightCol.z);
+        glUniform3f(lightPosLoc,    lightPos.x, lightPos.y, lightPos.z);
+        float factor = 1;
+        //float factor = (penguinZpos - carZ) / (penguinZpos);
+//        factor = (factor < 0 ? -factor: factor);
+//        factor = factor > penguinZpos-2 ? (1-factor)+0.5:factor ;
+        glUniform1f(factorLoc, factor);
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
