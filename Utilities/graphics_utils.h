@@ -71,7 +71,6 @@ public:
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         
         
-        
         window = glfwCreateWindow(width, height, "CrossyRoad", NULL, NULL);
         
         // Create and configure window
@@ -101,10 +100,6 @@ public:
     }
     penguinMovement do_movement(GLfloat deltaTime, bool& movingForward, bool& movingBackward, bool& movingRight, bool& movingLeft)
     {
-        if(keys[GLFW_KEY_Q])
-            camera->ProcessKeyboard(FRONT, deltaTime);
-        if(keys[GLFW_KEY_E])
-            camera->ProcessKeyboard(BACK, deltaTime);
         if(keys[GLFW_KEY_W])
             camera->ProcessKeyboard(FORWARD, deltaTime);
         if(keys[GLFW_KEY_S])
