@@ -16,7 +16,7 @@ public:
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
-        objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ - 0.25f));
+        objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
         objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
@@ -30,4 +30,7 @@ public:
 private:
     Shader shader;
     Model* carModel;
+    GLint speed;
+    GLint xPos;
+    
 };
