@@ -41,6 +41,7 @@ int main(int argc, const char * argv[]) {
     Shader objShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
     Shader carShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.frag");
     Shader fontShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.frag");
+
     
     // Load gamescene
     GameScene gameScene(mainShader);
@@ -90,7 +91,6 @@ int main(int argc, const char * argv[]) {
         
         // Draw the scene (lanes + cars)
         gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck);
-        
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].startPos){
             Utilities::addMoreLanes(lanesArray, newStart);
