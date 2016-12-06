@@ -48,25 +48,17 @@ int main(int argc, const char * argv[]) {
     Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/penguin.dae");
     penguin.setPenPosition(0, 1.4f, -3.0); // Set initial posisiton
     Car car(carShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
-    
+    Car truck(carShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
+  
     
     // Generate lanes
     vector<lane> lanesArray;
     Utilities::generateLanesAlgorithm(lanesArray);
     
-    
     float newStart = -1.3;
-    // To remove
-    float*carsXPosition=new float[lanesArray.size()];
-    for(int i = 0; i < lanesArray.size(); i++){
-        carsXPosition[i] = rand() % 18 + 12;
-    }
-    int varSpeed=1;
-    bool firstLanesSet = true;
     // Some variables for game logic go here::
     GLuint frameCount = 0;
-    GLfloat laneAccumulatedSpeedAccelaration = 0;
-    
+   
     // Loading fonts
     Fonts fonts(fontShader, gameWidth, gameHeight, "/Users/ibrahimradwan/Desktop/zorque.ttf");
     
@@ -97,12 +89,11 @@ int main(int argc, const char * argv[]) {
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward));
         
         // Draw the scene (lanes + cars)
-        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car);
+        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck);
         
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].startPos){
-            Utilities::addMoreLanes(lanesArray, newStart, firstLanesSet, carsXPosition);
-            laneAccumulatedSpeedAccelaration += 34;
+            Utilities::addMoreLanes(lanesArray, newStart);
         }
             
         frameCount++;

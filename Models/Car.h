@@ -8,7 +8,7 @@ public:
     Car(Shader shader, GLchar* modelLink):shader(shader){
         carModel = new Model(modelLink);
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, float carX, float carY, float carZ, bool carRotation){
         shader.Use();
         glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
         GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
@@ -16,8 +16,15 @@ public:
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
-        objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
-        objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        if(carRotation){
+            objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
+            objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        }else{
+            objmodel = glm::translate(objmodel, glm::vec3( carX, 0.5, carZ));
+            objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+            objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            
+        }
         objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
         GLint objviewLoc = glGetUniformLocation(shader.Program, "view");

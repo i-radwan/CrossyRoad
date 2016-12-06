@@ -9,13 +9,14 @@ struct lane{
     int type;
     bool drawnBefore = 0;
     bool isVisited = false;
+    bool isTruck = false;
     
     lane(){
     }
     void moveCar (){
         laneCarXPosition += laneCarSpeed;
         if(laneCarXPosition < -25){
-            laneCarXPosition =  14 + (rand() % (int)(22 - 14 + 1));
+            laneCarXPosition =  14 + (rand() % (int)(30 - 14 + 1));
         }
     }
     void setLaneCarSpeed(GLfloat speed){
@@ -77,10 +78,15 @@ public:
     static void generateLanesAlgorithm(vector<lane>& lanesArray) {
         int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
         for(int i = 0 ;i < 52; i++){
+            int random= (1 + rand() % (200 - 1));
+
             lane s;
             s.type = lanesData[i];
             s.startPos = 0;
             s.drawnBefore = 0;
+            if(random % 3 == 1 || random % 5 == 1 ){
+                s.isTruck = true;
+            }
             // Set speed
             if(i < 20 == 0){
                 s.setLaneCarSpeed(s.getLaneCarSpeed() - (i + 1) * 0.001);
@@ -94,7 +100,7 @@ public:
             lanesArray.push_back(s);
         }
     }
-    static void addMoreLanes(vector<lane>& lanesArray,float &newstart, bool& firstLanesSet, float* carsXPosition) {
+    static void addMoreLanes(vector<lane>& lanesArray, float &newstart) {
         int lanesData[50];
         //autogeneration
         generateLaneData(lanesData);
@@ -106,10 +112,15 @@ public:
             lastCarSpeed = min(lanesArray[j].getLaneCarSpeed(), lastCarSpeed);
         }
         for(int i = 0, j = (52-32); i < 32; i++, j++){
+            int random= (1 + rand() % (200 - 1));
+            
             lane s;
             s.startPos = 0;
             s.type = lanesData[i];
             s.drawnBefore = 0;
+            if(random % 3 == 1 || random % 5 == 1 ){
+                s.isTruck = true;
+            }
             if(i <= 20){
                 s.setLaneCarSpeed(s.getLaneCarSpeed() + (lastCarSpeed - (i + 1) * 0.001));
             }else if(i > 20 && i < 40) {
@@ -121,7 +132,6 @@ public:
         lanesArray.clear();
         lanesArray = newLanesArray;
         newstart = lanesArray[0].startPos;
-        firstLanesSet= false;
     }
     
 };

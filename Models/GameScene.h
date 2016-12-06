@@ -7,13 +7,18 @@ class GameScene{
 public:
     GameScene(Shader shader):shader(shader){
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, Car& car){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, Car& car, Car& truck){
         //Draw lanes
         float zpos = newStart;
         for(GLuint i = 0; i < lanesArray.size(); i++)
         {
             if(lanesArray[i].type == 1){
-                car.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 1.3, zpos);
+                if(!lanesArray[i].isTruck){
+                    car.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 1.3, zpos, true);
+                }
+                else{
+                    truck.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 1.3, zpos, false);
+                }
                 lanesArray[i].moveCar();
             }
             shader.Use();
