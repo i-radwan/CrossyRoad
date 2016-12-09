@@ -23,7 +23,7 @@ void main() {
     if(safeland == 1.0f && IsSafeLaneAfterSafeLane == 1.0f){
          originalColor = vec3(0.6588f, 0.8549f, 0.380f);
     }
-    if(safeland == 1.0f && Normal == vec3(0.0f, 0.0f, 1.0f)&& IsSafeLaneAfterSafeLane == 0.0f){
+    if(safeland == 1.0f && Normal == vec3(0.0f, 0.0f, 1.0f) && IsSafeLaneAfterSafeLane == 0.0f){
         originalColor = vec3(0.46666f, 0.6156f, 0.2745f);
     }
     if(IsNormalLaneBeforeNormalLane == 1.0f &&

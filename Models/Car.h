@@ -16,16 +16,16 @@ public:
         
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
-        if(carRotation){
+        if(carRotation){ // Means small car
             objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
             objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        }else{
+            objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
+        } else{ // Means truck
             objmodel = glm::translate(objmodel, glm::vec3( carX, 0.5, carZ));
             objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            
+            objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         }
-        objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
         GLint objviewLoc = glGetUniformLocation(shader.Program, "view");
         GLint objprojectionLoc = glGetUniformLocation(shader.Program, "projection");
