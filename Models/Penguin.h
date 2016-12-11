@@ -8,7 +8,7 @@ public:
     Penguin(Shader shader, GLchar* modelLink, Camera& c):shader(shader), camera(c){
         penguinModel = new PenModel(modelLink);
     }
-    bool double_equals(double a, double b, double epsilon = 0.01)
+    bool double_equals(double a, double b, double epsilon = 0.1)
     {
         return std::abs(a - b) < epsilon;
     }
@@ -30,15 +30,15 @@ public:
                 if(this->targetZ - this->penZ > (this->penZ - this->initalZ )) this->penY -= 0.15f;
                 else this->penY += 0.15f;
                 // Move the penguin
-                this->penZ -= 0.05f;
+                this->penZ -= penguinSpeed;
                 // Move camera
-                glm::vec3 v(0,0,-0.05);
+                glm::vec3 v(0,0,-penguinSpeed);
                 camera.updateCameraPos(v);
             } else if(!double_equals(this->targetZ, this->penZ) && this->targetZ > this->penZ ){
                 if(this->targetZ - this->penZ > (this->penZ - this->initalZ )) this->penY += 0.15f;
                 else this->penY -= 0.15f;
-                this->penZ += 0.05f;
-                glm::vec3 v(0,0,0.05);
+                this->penZ += penguinSpeed;
+                glm::vec3 v(0,0, penguinSpeed);
                 camera.updateCameraPos(v);
             }
         }
@@ -143,6 +143,7 @@ public:
     PenModel* getPenguinMode(){return this->penguinModel;}
     int getCurrentLane(){return this->currentLaneIndex;}
 private:
+    const float penguinSpeed = 0.1f;
     const float constantPenY = 1.4f;
     Shader shader;
     Camera& camera;
