@@ -3,11 +3,48 @@
 #include <string>
 using namespace std;
 class Penguin{
+   
 public:
-    Penguin(Shader shader, GLchar* modelLink):shader(shader){
+    Penguin(Shader shader, GLchar* modelLink, Camera& c):shader(shader), camera(c){
         penguinModel = new PenModel(modelLink);
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint frameCount, bool moving){
+    bool double_equals(double a, double b, double epsilon = 0.01)
+    {
+        return std::abs(a - b) < epsilon;
+    }
+    
+    void movePenguinTowardsTarget(float deltaTime, vector<lane> &lanesArray){
+        if(isMoving) {
+            if(double_equals(this->targetZ, this->penZ)){
+                isMoving = false;
+                this->penY = constantPenY;
+                // Handle continous click
+                if(this->movingForwad){
+                    this->isMoving = true; // Set penguin status to moving
+                    this->targetZ = getNextLaneZ(lanesArray);
+                    this->initalZ = this->penZ;
+                }
+            }
+            if(!double_equals(this->targetZ, this->penZ) && this->targetZ < this->penZ ){
+                // Jump the penguin
+                if(this->targetZ - this->penZ > (this->penZ - this->initalZ )) this->penY -= 0.15f;
+                else this->penY += 0.15f;
+                // Move the penguin
+                this->penZ -= 0.05f;
+                // Move camera
+                glm::vec3 v(0,0,-0.05);
+                camera.updateCameraPos(v);
+            } else if(!double_equals(this->targetZ, this->penZ) && this->targetZ > this->penZ ){
+                if(this->targetZ - this->penZ > (this->penZ - this->initalZ )) this->penY += 0.15f;
+                else this->penY -= 0.15f;
+                this->penZ += 0.05f;
+                glm::vec3 v(0,0,0.05);
+                camera.updateCameraPos(v);
+            }
+        }
+    }
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint frameCount, bool moving, float deltaTime, vector<lane> &lanesArray){
+        movePenguinTowardsTarget(deltaTime, lanesArray);
         shader.Use();
         glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
         GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
@@ -16,7 +53,14 @@ public:
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( this->penX, this->penY, this->penZ));
-        objmodel = glm::rotate(objmodel, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        if(this->movingRight){
+            objmodel = glm::rotate(objmodel, glm::radians(-80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+        else if(this->movingLeft){
+            objmodel = glm::rotate(objmodel, glm::radians(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        }else{
+            objmodel = glm::rotate(objmodel, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        }
         objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         objmodel = glm::scale(objmodel, glm::vec3(0.13f, 0.13f, 0.13f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
@@ -25,35 +69,57 @@ public:
         glUniformMatrix4fv(objviewLoc, 1, GL_FALSE, glm::value_ptr(cameraViewMat));
         glUniformMatrix4fv(objprojectionLoc, 1, GL_FALSE, glm::value_ptr(objprojection));
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
-        penguinModel->Draw(shader, frameCount, objmodel, moving);
+        penguinModel->Draw(shader, frameCount, objmodel, moving || this->isMoving);
     }
-    void move(bool movingForward, bool movingBackward, bool movingRight, bool movingLeft, Camera &camera, GLfloat deltaTime, float startPos){
-        deltaTime*=100;
-        if(movingForward){
-            setPenZ(getPenZ() - 0.1f*deltaTime);
-            glm::vec3 v(0,0,-0.1*deltaTime);
-            camera.updateCameraPos(v);
+    float getNextLaneZ(vector<lane> &lanesArray){
+        for (int i = 0; i<lanesArray.size(); i++) {
+            if(double_equals(lanesArray[i].startPos, this->penZ)){
+                this->currentLaneIndex = i+1;
+                return lanesArray[i+1].startPos;
+            }
         }
-        if (movingBackward){
+        return this->penZ;
+    }
+    float getPreviousLaneZ(vector<lane> &lanesArray){
+        for (int i = 0; i < lanesArray.size(); i++) {
+            if(i > 0&& double_equals(lanesArray[i].startPos, this->penZ)){
+                this->currentLaneIndex = i-1;
+                return lanesArray[i-1].startPos;
+            }
+        }
+        return this->penZ;
+    }
+    void move(bool movingForward, bool movingBackward, bool movingRight, bool movingLeft, Camera &camera, GLfloat deltaTime, float startPos, vector<lane> &lanesArray){
+        deltaTime*=100;
+        this->movingForwad = movingForward;
+        this->movingRight = movingRight;
+        this->movingLeft = movingLeft;
+        if(movingForward && !isMoving){
+            this->isMoving = true; // Set penguin status to moving
+            this->targetZ = getNextLaneZ(lanesArray);
+            this->initalZ = this->penZ;
+        }
+        if (movingBackward && !isMoving){
             if(getPenZ() <= startPos - 2){
-                setPenZ(getPenZ() + 0.1f*deltaTime);
-                glm::vec3 v(0,0,0.1*deltaTime);
-                camera.updateCameraPos(v);
+                this->isMoving = true; // Set penguin status to moving
+                this->targetZ = getPreviousLaneZ(lanesArray);
+                this->initalZ = this->penZ;
             }
         }
         if (movingRight && getPenX() < 9.5){
-            setPenX(getPenX() + 0.1f*deltaTime);
+            setPenX(getPenX() + 0.08f*deltaTime);
             
         }
         if (movingLeft && getPenX() > -7){
-            setPenX(getPenX() - 0.1f*deltaTime);
+            setPenX(getPenX() - 0.08f*deltaTime);
         }
-        
     }
     void setPenPosition(float penX, float penY, float penZ){
         this->penX = penX;
         this->penY = penY;
         this->penZ = penZ;
+        this->targetZ = penZ;
+        this->initalZ = this->penZ;
     }
     void setPenX(float penX){
         this->penX = penX;
@@ -68,10 +134,14 @@ public:
     float getPenY(){return this->penY;}
     float getPenZ(){return this->penZ;}
     PenModel* getPenguinMode(){return this->penguinModel;}
-    
+    int getCurrentLane(){return this->currentLaneIndex;}
 private:
+    const float constantPenY = 1.4f;
     Shader shader;
+    Camera& camera;
     PenModel* penguinModel;
-    float penX, penY, penZ;
-    
+    GLfloat penX, penY, penZ, targetZ, initalZ;
+    GLboolean isMoving = false;
+    bool movingForwad = false, movingRight, movingLeft;
+    int currentLaneIndex = 3;
 };

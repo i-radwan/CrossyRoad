@@ -46,8 +46,8 @@ int main(int argc, const char * argv[]) {
     // Load gamescene
     GameScene gameScene(mainShader);
     // Load MODELS
-    Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/penguin.dae");
-    penguin.setPenPosition(0, 1.4f, -3.0); // Set initial posisiton
+    Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
+    penguin.setPenPosition(0, 1.4f, -3.3f); // Set initial posisiton
     Car car(carShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
     Car truck(carShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
   
@@ -85,9 +85,9 @@ int main(int argc, const char * argv[]) {
         // Penguin drawing
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart);
+        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart, lanesArray);
         // penguin animations
-        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward));
+        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars)
         gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck);
