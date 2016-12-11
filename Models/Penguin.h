@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 class Penguin{
-   
+    
 public:
     Penguin(Shader shader, GLchar* modelLink, Camera& c):shader(shader), camera(c){
         penguinModel = new PenModel(modelLink);
@@ -54,14 +54,20 @@ public:
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( this->penX, this->penY, this->penZ));
         if(this->movingRight){
-            objmodel = glm::rotate(objmodel, glm::radians(-80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            if(!this->movingBackward)
+                objmodel = glm::rotate(objmodel, glm::radians(-80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            else objmodel = glm::rotate(objmodel, glm::radians(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         }
         else if(this->movingLeft){
-            objmodel = glm::rotate(objmodel, glm::radians(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            if(!this->movingBackward)
+                objmodel = glm::rotate(objmodel, glm::radians(80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            else objmodel = glm::rotate(objmodel, glm::radians(-80.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         }else{
             objmodel = glm::rotate(objmodel, glm::radians(-20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         }
-        objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        if(!this->movingBackward){
+            objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        }
         objmodel = glm::scale(objmodel, glm::vec3(0.13f, 0.13f, 0.13f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
         GLint objviewLoc = glGetUniformLocation(shader.Program, "view");
@@ -94,13 +100,14 @@ public:
         this->movingForwad = movingForward;
         this->movingRight = movingRight;
         this->movingLeft = movingLeft;
+        this->movingBackward = movingBackward;
         if(movingForward && !isMoving){
             this->isMoving = true; // Set penguin status to moving
             this->targetZ = getNextLaneZ(lanesArray);
             this->initalZ = this->penZ;
         }
         if (movingBackward && !isMoving){
-            if(getPenZ() <= startPos - 2){
+            if(getPenZ() <= startPos - 3){
                 this->isMoving = true; // Set penguin status to moving
                 this->targetZ = getPreviousLaneZ(lanesArray);
                 this->initalZ = this->penZ;
@@ -142,6 +149,6 @@ private:
     PenModel* penguinModel;
     GLfloat penX, penY, penZ, targetZ, initalZ;
     GLboolean isMoving = false;
-    bool movingForwad = false, movingRight, movingLeft;
+    bool movingForwad = false, movingRight = false, movingLeft = false, movingBackward = false;
     int currentLaneIndex = 3;
 };
