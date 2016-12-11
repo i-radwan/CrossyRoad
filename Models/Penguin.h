@@ -143,7 +143,7 @@ public:
     PenModel* getPenguinMode(){return this->penguinModel;}
     int getCurrentLane(){return this->currentLaneIndex;}
 private:
-    const float penguinSpeed = 0.1f;
+    const float penguinSpeed = 0.07f;
     const float constantPenY = 1.4f;
     Shader shader;
     Camera& camera;
