@@ -37,20 +37,20 @@ int main(int argc, const char * argv[]) {
     }
 
     // Load SHADERS
-    Shader mainShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.frag");
-    Shader objShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
-    Shader carShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.frag");
+    Shader sceneShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.frag");
+    Shader materialShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
+    Shader textureShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/carshader.frag");
     Shader fontShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.frag");
-
+    
     
     // Load gamescene
-    GameScene gameScene(mainShader);
+    GameScene gameScene(sceneShader);
     // Load MODELS
-    Penguin penguin(objShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
+    Penguin penguin(materialShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
     penguin.setPenPosition(0, 1.4f, -3.3f); // Set initial posisiton
-    Car car(carShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
-    Car truck(carShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
-  
+    Car car(textureShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
+    Car truck(textureShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
+    Coin coin(materialShader ,"/Users/ibrahimradwan/Desktop/coin/c.obj");
     
     // Generate lanes
     vector<lane> lanesArray;
@@ -90,7 +90,7 @@ int main(int argc, const char * argv[]) {
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars)
-        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck);
+        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck, coin);
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].startPos){
             Utilities::addMoreLanes(lanesArray, newStart);

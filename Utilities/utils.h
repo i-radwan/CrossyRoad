@@ -10,7 +10,9 @@ struct lane{
     bool drawnBefore = 0;
     bool isVisited = false;
     bool isTruck = false;
-    
+    bool hasCoin = false;
+    float coinXPosition = -1;
+    float coinRotation = 0;
     lane(){
     }
     void moveCar (){

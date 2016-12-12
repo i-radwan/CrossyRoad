@@ -15,11 +15,13 @@ public:
     
     void movePenguinTowardsTarget(float deltaTime, vector<lane> &lanesArray){
         if(isMoving) {
-            if(double_equals(this->targetZ, this->penZ)){
+            if(double_equals(this->targetZ, this->penZ)) {
                 isMoving = false;
-                this->penY = constantPenY;
+                if(lanesArray[this->currentLaneIndex].type == 0) {
+                    this->penY = constantPenY;
+                } else this->penY = constantPenY-0.2;
                 // Handle continous click
-                if(this->movingForwad){
+                if(this->movingForwad) {
                     this->isMoving = true; // Set penguin status to moving
                     this->targetZ = getNextLaneZ(lanesArray);
                     this->initalZ = this->penZ;

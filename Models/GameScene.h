@@ -1,5 +1,6 @@
 #include "../Utilities/shaders.h"
 #include "../Utilities/utils.h"
+#include "../Models/Coin.h"
 #include <glm/glm.hpp>
 #include <string>
 using namespace std;
@@ -7,7 +8,7 @@ class GameScene{
 public:
     GameScene(Shader shader):shader(shader){
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, Car& car, Car& truck){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, Car& car, Car& truck, Coin& coin){
         //Draw lanes
         float zpos = newStart;
         for(GLuint i = 0; i < lanesArray.size(); i++)
@@ -21,6 +22,28 @@ public:
                 }
                 lanesArray[i].moveCar();
             }
+            // ToDo change
+            // Draw the coin
+            GLint randNum = (10 + (rand() % (int)(2000 - 10 + 1)));
+            GLboolean addCoin = (randNum % 3 == 0);
+            if(zpos < -4 && addCoin && !lanesArray[i].hasCoin && !lanesArray[i].drawnBefore){
+                // Check if this x doesn't contain tree
+                GLfloat coinX = -6 + (rand() % (int)(9 - -6 + 1));
+                lanesArray[i].coinXPosition = coinX;
+                lanesArray[i].hasCoin = true;
+                coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, coinX, 0, zpos, lanesArray[i].coinRotation);
+                lanesArray[i].coinRotation++;
+                if(lanesArray[i].coinRotation > 360){
+                    lanesArray[i].coinRotation -= 360;
+                }
+            }else if(lanesArray[i].hasCoin){
+                 coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].coinXPosition, 0, zpos, lanesArray[i].coinRotation);
+                lanesArray[i].coinRotation++;
+                if(lanesArray[i].coinRotation > 360){
+                    lanesArray[i].coinRotation -= 360;
+                }
+            }
+            
             shader.Use();
             glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
             GLint lightColorLoc = glGetUniformLocation(shader.Program, "lightColor");
