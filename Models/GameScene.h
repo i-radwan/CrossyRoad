@@ -22,7 +22,6 @@ public:
                 }
                 lanesArray[i].moveCar();
             }
-            // ToDo change
             // Draw the coin
             GLint randNum = (10 + (rand() % (int)(2000 - 10 + 1)));
             GLboolean addCoin = (randNum % 3 == 0);
@@ -69,6 +68,7 @@ public:
             }
             if(lanesArray[i].type == 0){
                 glUniform1f(isSafeLaneLoc, 1.0f);
+                
             }
             if(i > 0 && lanesArray[i].type == 0 && lanesArray[i-1].type == 0){
                 glUniform1f(isSafeLaneAfterSafeLane, 1.0f);

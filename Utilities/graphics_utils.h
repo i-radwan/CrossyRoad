@@ -120,19 +120,19 @@ public:
     void bindCube(GLuint & VBO, GLuint & VAO){
         // Set vectices
         GLfloat vertices[] = {
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            -25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+            -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
             
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+            -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+            -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
         };
         // Bind vertex buffer object and vertex array object and set buffer data from vertices object
         // Set the attributes in shaders
