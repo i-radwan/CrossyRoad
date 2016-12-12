@@ -66,6 +66,8 @@ int main(int argc, const char * argv[]) {
     // Load the lane-cube into the fragment
     GLuint VBO, VAO;
     graphicsUtilities.bindCube(VBO, VAO);
+    GLuint VBOSafeLane, VAOSafeLane;
+    graphicsUtilities.bindCube(VBOSafeLane, VAOSafeLane, true);
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents(); // Check for keyboard or mouse events
@@ -90,7 +92,7 @@ int main(int argc, const char * argv[]) {
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars)
-        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, lanesArray, newStart, car, truck, coin);
+        gameScene.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, newStart, car, truck, coin);
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].startPos){
             Utilities::addMoreLanes(lanesArray, newStart);

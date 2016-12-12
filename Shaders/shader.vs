@@ -18,7 +18,7 @@ uniform float isSafeLane = 0.0;
 uniform float isSafeLaneAfterSafeLane = 0.0;
 uniform float isNormalLaneBeforeNormalLane = 0.0;
 void main() {
-    gl_Position = projection * view * model * vec4(position.x, ((isSafeLane == 1.0f) ? position.y+0.2f:position.y), position.z, 1.0f);
+    gl_Position = projection * view * model * vec4(position.x, position.y, position.z, 1.0f);
     Normal = mat3(transpose(inverse(model))) * normal;
     FragPos = vec3(model * vec4(position, 1.0f));
     

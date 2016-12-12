@@ -8,7 +8,7 @@ class GameScene{
 public:
     GameScene(Shader shader):shader(shader){
     }
-    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeAVO, vector<lane> &lanesArray,float &newStart, Car& car, Car& truck, Coin& coin){
+    void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio, float near, float far, GLuint cubeVAO, GLuint cubeSafeLaneVAO, vector<lane> &lanesArray,float &newStart, Car& car, Car& truck, Coin& coin){
         //Draw lanes
         float zpos = newStart;
         for(GLuint i = 0; i < lanesArray.size(); i++)
@@ -58,7 +58,7 @@ public:
             GLint isNormalLaneBeforeNormalLane = glGetUniformLocation(shader.Program, "isNormalLaneBeforeNormalLane");
             glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(cameraViewMat));
             glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(objprojection));
-            glBindVertexArray(cubeAVO);
+            glBindVertexArray(((lanesArray[i].type == 0) ? cubeVAO : cubeSafeLaneVAO));
             
             glm::mat4 model;
             model = glm::translate(model, glm::vec3( 0.0f, 0.0f, zpos));

@@ -18,11 +18,11 @@ private:
                              int mode)
     {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, GL_TRUE);
+        glfwSetWindowShouldClose(window, GL_TRUE);
         if(action == GLFW_PRESS)
-            keys[key] = true;
+        keys[key] = true;
         else if(action == GLFW_RELEASE)
-            keys[key] = false;
+        keys[key] = false;
     }
     void static mouse_callback(GLFWwindow* window, double xpos, double ypos){
         if(firstMouse)
@@ -100,51 +100,68 @@ public:
     penguinMovement do_movement(GLfloat deltaTime, bool& movingForward, bool& movingBackward, bool& movingRight, bool& movingLeft)
     {
         if(keys[GLFW_KEY_W])
-            camera->ProcessKeyboard(FORWARD, deltaTime);
+        camera->ProcessKeyboard(FORWARD, deltaTime);
         if(keys[GLFW_KEY_S])
-            camera->ProcessKeyboard(BACKWARD, deltaTime);
+        camera->ProcessKeyboard(BACKWARD, deltaTime);
         if(keys[GLFW_KEY_A])
-            camera->ProcessKeyboard(LEFT, deltaTime);
+        camera->ProcessKeyboard(LEFT, deltaTime);
         if(keys[GLFW_KEY_D])
-            camera->ProcessKeyboard(RIGHT, deltaTime);
+        camera->ProcessKeyboard(RIGHT, deltaTime);
         if(keys[GLFW_KEY_UP])
-            movingForward = true;
+        movingForward = true;
         if(keys[GLFW_KEY_DOWN])
-            movingBackward = true;
+        movingBackward = true;
         if(keys[GLFW_KEY_RIGHT])
-            movingRight = true;
+        movingRight = true;
         if(keys[GLFW_KEY_LEFT])
-            movingLeft = true;
+        movingLeft = true;
         return NO_MOVEMENT;
     }
-    void bindCube(GLuint & VBO, GLuint & VAO){
-        // Set vectices
-        GLfloat vertices[] = {
-            -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            -25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-            
-            -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-            25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-            -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
-        };
-        // Bind vertex buffer object and vertex array object and set buffer data from vertices object
-        // Set the attributes in shaders
-        
+    void bindCube(GLuint & VBO, GLuint & VAO, bool isSafeLane = false){
         
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        
+        // Set vectices
+        if(!isSafeLane){
+            GLfloat vertices[] = {
+                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                
+                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+            };
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+            
+        }else{
+            GLfloat vertices[] = {
+                -25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                
+                -25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f
+            };
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+            
+        }
         
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
