@@ -38,8 +38,13 @@ public:
             if (!double_equals(this->targetZ, this->penZ)
                 && this->targetZ < this->penZ) {
                 // Jump the penguin
-                if (this->targetZ - this->penZ > (this->penZ - this->initalZ))
+                if (this->targetZ - this->penZ > (this->penZ - this->initalZ)){
                     this->penY -= 0.15f;
+                                        if(!this->isMovedToAdjacentLane){
+                                            this->isMovedToAdjacentLane = true;
+                                            this->currentLaneIndex = this->adjacentLaneIndex;
+                                        }
+                }
                 else
                     this->penY += 0.15f;
                 // Move the penguin
@@ -51,8 +56,13 @@ public:
                        && this->targetZ > this->penZ) {
                 if (this->targetZ - this->penZ > (this->penZ - this->initalZ))
                     this->penY += 0.15f;
-                else
+                else{
+                                        if(!this->isMovedToAdjacentLane){
+                                            this->isMovedToAdjacentLane = true;
+                                            this->currentLaneIndex = this->adjacentLaneIndex;
+                                        }
                     this->penY -= 0.15f;
+                }
                 this->penZ += penguinSpeed;
                 glm::vec3 v(0, 0, penguinSpeed);
                 camera.updateCameraPos(v);
@@ -92,7 +102,7 @@ public:
             objmodel = glm::rotate(objmodel, glm::radians(-20.0f),
                                    glm::vec3(1.0f, 0.0f, 0.0f));
         }
-        if (!this->movingBackward) {
+        if ((!this->movingBackward || (this->isMoving && this->initalZ >= this->targetZ)) && !(this->isMoving && this->initalZ <= this->targetZ)) {
             objmodel = glm::rotate(objmodel, glm::radians(180.0f),
                                    glm::vec3(0.0f, 1.0f, 0.0f));
         }
@@ -109,10 +119,13 @@ public:
         penguinModel->Draw(shader, frameCount, objmodel,
                            moving || this->isMoving);
     }
+    
     float getNextLaneZ(vector<lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
             if (double_equals(lanesArray[i].startPos, this->penZ)) {
-                this->currentLaneIndex = i + 1;
+//                this->currentLaneIndex = i + 1;
+                this->adjacentLaneIndex = i+1;
+                this->isMovedToAdjacentLane = false;
                 return lanesArray[i + 1].startPos;
             }
         }
@@ -121,7 +134,9 @@ public:
     float getPreviousLaneZ(vector<lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
             if (i > 0 && double_equals(lanesArray[i].startPos, this->penZ)) {
-                this->currentLaneIndex = i - 1;
+//                this->currentLaneIndex = i - 1;
+                this->adjacentLaneIndex = i-1;
+                this->isMovedToAdjacentLane = false;
                 return lanesArray[i - 1].startPos;
             }
         }
@@ -189,14 +204,15 @@ public:
                 - (100.966 * 0.008) - 0.75;
             } else { //is truck
                 carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                + (312.692 * 0.008) + 0.15;
+                + (310.692 * 0.008) + 0.15;
                 carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                - (312.692 * 0.008) - 0.4;
+                - (310.692 * 0.008) - 0.4;
             }
             //collision with car's behind
             
             if ((penLeftPos < carRightPos) && (penRightPos >= carLeftPos)) {
                 carCollided = true;
+            
             }
             //collision with car's front
             if ((penRightPos >= carLeftPos) && (penLeftPos < carRightPos)) {
@@ -204,6 +220,7 @@ public:
             }
         }
         if (carCollided) {
+            cout << getCurrentLane() << " PenLeft " << penLeftPos << " penRight " << penRightPos << " carLeft " << carLeftPos << " carRiight " << carRightPos << endl;
             return carCollision;
         }
         
@@ -241,6 +258,9 @@ public:
     int getCurrentLane() {
         return this->currentLaneIndex;
     }
+    void setCurrentLaneIndex(int currentLane){
+        this->currentLaneIndex = currentLane;
+    }
 private:
     const float penguinSpeed = 0.07f;
     const float constantPenY = 1.4f;
@@ -251,6 +271,8 @@ private:
     GLboolean isMoving = false;
     bool movingForwad = false, movingRight = false, movingLeft = false,
     movingBackward = false;
-    int currentLaneIndex = 3;
+    int currentLaneIndex = 2;
+    int adjacentLaneIndex;
+    bool isMovedToAdjacentLane = false;
 };
 #endif

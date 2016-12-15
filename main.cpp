@@ -93,11 +93,7 @@ int main(int argc, const char * argv[]) {
         graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
         penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart, lanesArray);
         // penguin animations
-        collisionState=penguin.detectCollision(lanesArray);
         
-        if (collisionState == carCollision) {
-            gameOver = true;
-        }
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars)
@@ -105,8 +101,13 @@ int main(int argc, const char * argv[]) {
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].startPos){
             Utilities::addMoreLanes(lanesArray, newStart);
+            penguin.setCurrentLaneIndex(4);
         }
-        
+        // Check for collisions
+        collisionState=penguin.detectCollision(lanesArray);
+        if (collisionState == carCollision) {
+            gameOver = true;
+        }
         frameCount++;
         if(frameCount >= penguin.getPenguinMode()->getModelAnimations()[0].second.size()){
             frameCount = 0;
