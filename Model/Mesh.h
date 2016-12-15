@@ -1,3 +1,5 @@
+#ifndef MESH
+#define MESH
 #include <vector>
 #include <string>
 #include "../Utilities/shaders.h"
@@ -55,6 +57,53 @@ public:
         glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+    
+    void Draw(Shader shader, GLuint &depthMap)
+    {
+        GLuint diffuseNr = 1;
+        GLuint specularNr = 1;
+        GLuint i = 0;
+        for(; i < this->textures.size(); i++)
+        {
+            glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
+            // Retrieve texture number (the N in diffuse_textureN)
+            // ToDo remove not needed code
+            stringstream ss;
+            string number;
+            string name = this->textures[i].type;
+            if(name == "texture_diffuse")
+                ss << diffuseNr++; // Transfer GLuint to stream
+            else if(name == "texture_specular")
+                ss << specularNr++; // Transfer GLuint to stream
+            number = ss.str();
+            glUniform1f(glGetUniformLocation(shader.Program, ("material." +
+                                                              name + number).c_str()), i);
+            glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
+        }
+        glActiveTexture(GL_TEXTURE1 + i);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        
+        glUniform4f(glGetUniformLocation(shader.Program, "diffuseColor"), this->colors.diffColor.r,this->colors.diffColor.g,this->colors.diffColor.b,this->colors.diffColor.a);
+        
+        glUniform4f(glGetUniformLocation(shader.Program, "ambientColor"), this->colors.ambiColor.r,this->colors.ambiColor.g,this->colors.ambiColor.b,this->colors.ambiColor.a);
+        
+        glUniform4f(glGetUniformLocation(shader.Program, "specularColor"), this->colors.specColor.r,this->colors.specColor.g,this->colors.specColor.b,this->colors.specColor.a);
+        
+        glUniform4f(glGetUniformLocation(shader.Program, "emiColor"), this->colors.emiColor.r,this->colors.emiColor.g,this->colors.emiColor.b,this->colors.emiColor.a);
+        
+        glActiveTexture(GL_TEXTURE0);
+        // Draw mesh
+        glBindVertexArray(this->VAO);
+        glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
+    void Render(){
+        // Draw mesh
+        glBindVertexArray(this->VAO);
+        glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
 private:
     /* Render data */
     GLuint VAO, VBO, EBO;
@@ -90,3 +139,4 @@ private:
         
     }
 };
+#endif

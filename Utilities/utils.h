@@ -11,9 +11,19 @@ struct lane{
     bool isVisited = false;
     bool isTruck = false;
     bool hasCoin = false;
-    float coinXPosition = -1;
+    float coinXPosition = 0;
     float coinRotation = 0;
+    //Note that the Z coordinate is the startPos of the lane + some offset
+    float treeXpos = -3;
+    bool treeDrawn = 0;
     lane(){
+        setTreeXPos();
+    }
+    void setTreeXPos(){
+        // 77 is the first number poped in my mind, ther is no scientific reason behind.
+        treeXpos = ( (rand() * rand() * rand() * rand())%77 * (rand() > 6 ? -1 : 1 ))%15;
+        //Debuging Code
+        //cout << "treeeeeeeeeeeeeeeeeee " << treeXpos << endl;
     }
     void moveCar (){
         laneCarXPosition += laneCarSpeed;

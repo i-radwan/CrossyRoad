@@ -23,7 +23,7 @@ enum Camera_Movement {
 // Default camera values
 const GLfloat YAW        = -90.0f;
 const GLfloat PITCH      =  0.0f;
-const GLfloat SPEED      =  3.0f;
+const GLfloat SPEED      =  10.0f;
 const GLfloat SENSITIVTY =  0.9f;
 const GLfloat ZOOM       =  40.0f;
 
@@ -45,7 +45,7 @@ public:
     GLfloat MovementSpeed;
     GLfloat MouseSensitivity;
     GLfloat Zoom;
-    bool disableCamera = false; // Set true to disable camera
+    bool disableCamera = true; // Set true to disable camera
     // Constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = YAW, GLfloat pitch = PITCH) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVTY), Zoom(ZOOM)
     {

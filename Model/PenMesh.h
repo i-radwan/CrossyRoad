@@ -96,6 +96,26 @@ public:
         glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
+    void Render(Shader &depthShader, vector<pair< string, vector<animationData> > > anim, GLuint frameCount,  glm::mat4 objmodel, bool moving){
+        // Before drawing the mesh get from anim vector the animation value corrsponding to the node name and current framCount and apply these changes to the objmodel mat4 and then set the uniform into the shader and then draw
+        if(moving)
+            for (int i = 0; i < anim.size(); i++) {
+                if(anim[i].first == this->name){
+                    animationData animationdata =  anim[i].second[frameCount];
+                    //                objmodel = glm::rotate(objmodel, (animationdata.rotation.x), glm::vec3(1.0,0,0));
+                    //                objmodel = glm::rotate(objmodel, (animationdata.rotation.y), glm::vec3(0,1.0,0));
+                    objmodel = glm::rotate(objmodel, (animationdata.rotation.z * 3), glm::vec3(0,0,1.0));
+                    GLint objmodelLoc = glGetUniformLocation(depthShader.Program, "model");
+                    glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
+                    break;
+                }
+            }
+        // Draw mesh
+        glBindVertexArray(this->VAO);
+        glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        
+    }
 private:
     /* Render data */
     GLuint VAO, VBO, EBO;

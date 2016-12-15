@@ -23,6 +23,11 @@ public:
         for(GLuint i = 0; i < this->meshes.size(); i++)
             this->meshes[i].Draw(shader, this->modelAnimations, frameCount, objmodel, moving);
     }
+    void Render(Shader &depthShader, GLuint frameCount, glm::mat4 objmodel, bool moving){
+        for(GLuint i = 0; i < this->meshes.size(); i++)
+            this->meshes[i].Render(depthShader, this->modelAnimations, frameCount, objmodel, moving);
+    }
+    
     vector<pair< string, vector<animationData> > > getModelAnimations(){return this->modelAnimations;}
 private:
     /*  Model Data  */
