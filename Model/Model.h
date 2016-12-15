@@ -1,3 +1,5 @@
+#ifndef MODEL
+#define MODEL
 #include "Mesh.h"
 
 vector<Texture> all_loaded_textures;
@@ -160,6 +162,7 @@ private:
         {
             aiString str;
             mat->GetTexture(type, i, &str);
+            cout << str.C_Str()<<endl;
             GLboolean skip = false;
             for(GLuint j = 0; j < all_loaded_textures.size(); j++)
             {
@@ -207,3 +210,4 @@ private:
         return textureID;
     }
 };
+#endif

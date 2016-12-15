@@ -1,3 +1,6 @@
+#ifndef PEN_MODEL
+#define PEN_MODEL
+
 #include "PenMesh.h"
 #include <iostream>
 #include <string>
@@ -258,4 +261,4 @@ private:
         return textureID;
     }
 };
-
+#endif

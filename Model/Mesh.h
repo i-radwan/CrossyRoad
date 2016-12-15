@@ -1,7 +1,8 @@
 #include <vector>
 #include <string>
 #include "../Utilities/shaders.h"
-
+#include "../Model/PenMesh.h"
+#include "../Utilities/utils.h"
 using namespace std;
 
 class Mesh {

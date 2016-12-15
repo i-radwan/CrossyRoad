@@ -1,3 +1,6 @@
+#ifndef PEN_MESH
+#define PEN_MESH
+
 #include <vector>
 #include <string>
 #include "../Utilities/shaders.h"
@@ -131,4 +134,4 @@ private:
         
     }
 };
-
+#endif

@@ -27,16 +27,17 @@ public:
             GLboolean addCoin = (randNum % 3 == 0);
             if(zpos < -4 && addCoin && !lanesArray[i].hasCoin && !lanesArray[i].drawnBefore){
                 // Check if this x doesn't contain tree
-                GLfloat coinX = -6 + (rand() % (int)(9 - -6 + 1));
-                lanesArray[i].coinXPosition = coinX;
-                lanesArray[i].hasCoin = true;
-                coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, coinX, 0, zpos, lanesArray[i].coinRotation);
-                lanesArray[i].coinRotation++;
-                if(lanesArray[i].coinRotation > 360){
-                    lanesArray[i].coinRotation -= 360;
-                }
-            }else if(lanesArray[i].hasCoin){
-                 coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].coinXPosition, 0, zpos, lanesArray[i].coinRotation);
+                if(!lanesArray[i].isCoinConsumed){
+                    GLfloat coinX = -6 + (rand() % (int)(9 - -6 + 1));
+                    lanesArray[i].coinXPosition = coinX;
+                    lanesArray[i].hasCoin = true;                    
+                    coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, coinX, 0, zpos, lanesArray[i].coinRotation);
+                    lanesArray[i].coinRotation++;
+                    if(lanesArray[i].coinRotation > 360){
+                        lanesArray[i].coinRotation -= 360;
+                    }}
+            }else if(lanesArray[i].hasCoin && !lanesArray[i].isCoinConsumed){
+                coin.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].coinXPosition, 0, zpos, lanesArray[i].coinRotation);
                 lanesArray[i].coinRotation++;
                 if(lanesArray[i].coinRotation > 360){
                     lanesArray[i].coinRotation -= 360;

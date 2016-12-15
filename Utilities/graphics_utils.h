@@ -1,8 +1,12 @@
+#ifndef GFX_UTILS
+#define GFX_UTILS
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "camera.h"
-
+#include "../Utilities/utils.h"
+#include "../Models/Penguin.h"
 using namespace std;
 
 enum penguinMovement{
@@ -117,6 +121,37 @@ public:
         movingLeft = true;
         return NO_MOVEMENT;
     }
+    
+    void score(vector<lane> &lanesArray, long &score, Penguin* pen) {
+        bool isCollided = false;
+        float penRightPos = pen->getPenX() + (1.492 * 0.13);
+        float penLeftPos = pen->getPenX() - (1.492 * 0.13);
+        float coinRightPos, coinLeftPos;
+        //adding +1 to score if not visited lane
+        if (lanesArray[pen->getCurrentLane()].type) {
+            if (!(lanesArray[pen->getCurrentLane()].isVisited)) {
+                score++;
+                lanesArray[pen->getCurrentLane()].isVisited = true;
+            }
+        }
+        if (lanesArray[pen->getCurrentLane()].hasCoin && !lanesArray[pen->getCurrentLane()].isCoinConsumed) {
+            coinRightPos = lanesArray[pen->getCurrentLane()].coinXPosition + 0.4;
+            coinLeftPos = lanesArray[pen->getCurrentLane()].coinXPosition - 0.4;
+            
+            if ((penLeftPos < coinRightPos) && (penRightPos >= coinLeftPos)) {
+                isCollided = true;
+            }
+            if ((penRightPos >= coinLeftPos) && (penLeftPos < coinRightPos)) {
+                isCollided = true;
+            }
+            if(isCollided) lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
+        }
+        //adding +100 to score if collided with a coin
+        if (isCollided) {
+            score += 10;
+        }
+        
+    }
     void bindCube(GLuint & VBO, GLuint & VAO, bool isSafeLane = false){
         
         glGenVertexArrays(1, &VAO);
@@ -178,3 +213,4 @@ GLfloat GraphicsUtilities::lastX;
 GLfloat GraphicsUtilities::lastY;
 GLboolean GraphicsUtilities::firstMouse;
 Camera* GraphicsUtilities::camera;
+#endif

@@ -1,3 +1,6 @@
+#ifndef UTILS
+#define UTILS
+
 #include <vector>
 #include "../Models/Car.h"
 
@@ -13,6 +16,7 @@ struct lane{
     bool hasCoin = false;
     float coinXPosition = -1;
     float coinRotation = 0;
+    bool isCoinConsumed = false;
     lane(){
     }
     void moveCar (){
@@ -137,3 +141,4 @@ public:
     }
     
 };
+#endif
