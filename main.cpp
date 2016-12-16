@@ -21,7 +21,6 @@ GLfloat lastFrame = 0.0f;
 Camera camera(glm::vec3(0.0f, 4.0f, 5.0f));
 
 // Configure depth map FBO (UHD 3840×2160) resolution for better shadow Appearance
-const GLuint SHADOW_WIDTH = 4400, SHADOW_HEIGHT = 4000;
 const GLint gameWidth = 750;
 const GLint gameHeight = 800;
 
@@ -31,17 +30,13 @@ bool exitGame = false;
 bool gameOverSoundPlayed= false;
 GLFWwindow* window;
 
-float lx = -22, ly = 40, lz = -30,ax = 0,ay = 0,az = -30;
-glm::vec3 lightPos(lx, ly, lz);
+float lightX = -22, lightY = 35, lightZ = -30, lookAtX = 0,lookAtY = 0,lookAtZ = -30;
 
 collisionStatus collisionState;
 
 //For Rendering the DepthMap (Debuging and testing)
 GLuint quadVAO = 0;
 GLuint quadVBO;
-
-
-void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane);
 
 int main(int argc, const char * argv[]) {
     
@@ -81,7 +76,7 @@ int main(int argc, const char * argv[]) {
     Tree tree(textureShader, "/Users/ibrahimradwan/Desktop/Tree/tree_4.obj");
     
     // Generate lanes
-    vector<lane> lanesArray;
+    vector<Lane> lanesArray;
     Utilities::generateLanesAlgorithm(lanesArray);
     
     // Some variables for game logic go here::
@@ -90,7 +85,7 @@ int main(int argc, const char * argv[]) {
     // Loading fonts
     Fonts fonts(fontShader, gameWidth, gameHeight, "/Users/ibrahimradwan/Desktop/zorque.ttf");
     
-    // Load the lane-cube into the fragment
+    // Load the Lane-cube into the fragment
     GLuint VBO, VAO;
     graphicsUtilities.bindCube(VBO, VAO);
     GLuint VBOSafeLane, VAOSafeLane;
@@ -101,7 +96,7 @@ int main(int argc, const char * argv[]) {
     //depth texture
     GLuint depthMap;
     //DeapthMap Buffer Bindings
-    graphicsUtilities.DepthMapInitialization(depthMapFBO, depthMap, SHADOW_WIDTH, SHADOW_HEIGHT);
+    graphicsUtilities.DepthMapInitialization(depthMapFBO, depthMap, Constants::SHADOW_WIDTH, Constants::SHADOW_HEIGHT);
     
     //depthMapInitializtion(depthMap, depthMapFBO,SHADOW_WIDTH,SHADOW_HEIGHT);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -127,17 +122,16 @@ int main(int argc, const char * argv[]) {
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
         GLfloat near_plane = -1.0f, far_plane = 60.0f;
-        lightPos = glm::vec3(lx, ly, lz);
         
         //Penguin Movement Attributes
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         
         //Call Render Everything functuion
-        RenderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane);
+        graphicsUtilities.renderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane, glm::vec3(lightX, lightY, lightZ), lookAtX, lookAtY, lookAtZ, camera);
         
         //Update the Light Pos And the Light Look at
-        lz = penguin.getPenZ() + 8.3;
-        az = penguin.getPenZ() + 36.3;
+        lightZ = penguin.getPenZ() + 8.3;
+        lookAtZ = penguin.getPenZ() + 36.3;
         
         // Clear screen with certain background color
         glViewport(0, 0, gameWidth*2, gameHeight*2);
@@ -156,7 +150,7 @@ int main(int argc, const char * argv[]) {
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars + Diamonds + trees)
-        gameScene.draw(lightSpaceMatrix, depthMap, camera, lightPos, shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
+        gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].laneZPos){
@@ -203,23 +197,3 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane){
-    
-    lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
-    lightView = glm::lookAt(lightPos, glm::vec3(ax, ay, az), glm::vec3(0.0, 1.0, 0.0));
-    //Light Space Matrix has the view and the projection
-    lightSpaceMatrix = lightProjection * lightView;
-    // Now render scene from light's point of view
-    simpleDepthShader.Use();
-    glUniformMatrix4fv(glGetUniformLocation(simpleDepthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    //Render The Penguin
-    graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-    penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
-    penguin.Render(simpleDepthShader, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
-    //Render Gamescene(Lanes, Coins, Trees, Cars)
-    gameScene.Render(simpleDepthShader, lanesArray, VAO, VAOSafeLane, car, truck, coin, tree);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}

@@ -99,7 +99,7 @@ public:
         glBindVertexArray(0);
     }
 
-    void Render(){
+    void render(){
         // Draw mesh
         glBindVertexArray(this->VAO);
         glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);

@@ -99,7 +99,7 @@ public:
         glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
-    void Render(Shader &depthShader, vector<pair< string, vector<animationData> > > anim, GLuint frameCount,  glm::mat4 objmodel, bool moving){
+    void render(Shader &depthShader, vector<pair< string, vector<animationData> > > anim, GLuint frameCount,  glm::mat4 objmodel, bool moving){
         // Before drawing the mesh get from anim vector the animation value corrsponding to the node name and current framCount and apply these changes to the objmodel mat4 and then set the uniform into the shader and then draw
         if(moving)
             for (int i = 0; i < anim.size(); i++) {

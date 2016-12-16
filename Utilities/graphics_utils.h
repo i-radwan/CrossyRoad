@@ -7,6 +7,9 @@
 #include "camera.h"
 #include "../Utilities/utils.h"
 #include "../Models/Penguin.h"
+#include "../Models/Coin.h"
+#include "../Models/Tree.h"
+#include "../Models/GameScene.h"
 #include "shaders.h"
 #include <irrKlang/irrKlang.h>
 
@@ -128,12 +131,12 @@ public:
         return NO_MOVEMENT;
     }
     
-    void score(vector<lane> &lanesArray, long &score, Penguin* pen, irrklang::ISoundEngine* engine) {
+    void score(vector<Lane> &lanesArray, long &score, Penguin* pen, irrklang::ISoundEngine* engine) {
         bool isCollided = false;
         float penRightPos = pen->getPenX() + (1.492 * 0.13);
         float penLeftPos = pen->getPenX() - (1.492 * 0.13);
         float coinRightPos, coinLeftPos;
-        //adding +1 to score if not visited lane
+        //adding +1 to score if not visited Lane
         if (lanesArray[pen->getCurrentLane()].type) {
             if (!(lanesArray[pen->getCurrentLane()].isVisited)) {
                 score++;
@@ -188,19 +191,19 @@ public:
             
         }else{
             GLfloat vertices[] = {
-                -25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25,  0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25, -0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25, -0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25, -0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                25,  0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25,  0.7f,  0.5f,  0.0f,  0.0f, 1.0f,
+                -25, -0.3f,  0.5f,  0.0f,  0.0f, 1.0f,
                 
-                -25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.3f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.3f, -0.5f,  0.0f,  1.0f,  0.0f
+                -25,  0.7f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.7f, -0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.7f,  0.5f,  0.0f,  1.0f,  0.0f,
+                25,  0.7f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.7f,  0.5f,  0.0f,  1.0f,  0.0f,
+                -25,  0.7f, -0.5f,  0.0f,  1.0f,  0.0f
             };
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             
@@ -265,7 +268,27 @@ public:
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-   
+    
+    void renderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<Lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane, glm::vec3 lightPos, float looktAtX, float looktAtY, float looktAtZ, Camera& camera){
+        
+        lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+        lightView = glm::lookAt(lightPos, glm::vec3(looktAtX, looktAtY, looktAtZ), glm::vec3(0.0, 1.0, 0.0));
+        //Light Space Matrix has the view and the projection
+        lightSpaceMatrix = lightProjection * lightView;
+        // Now render scene from light's point of view
+        simpleDepthShader.Use();
+        glUniformMatrix4fv(glGetUniformLocation(simpleDepthShader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        glViewport(0, 0, Constants::SHADOW_WIDTH, Constants::SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        //Render The Penguin
+        graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
+        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
+        penguin.render(simpleDepthShader, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
+        //Render Gamescene(Lanes, Coins, Trees, Cars)
+        gameScene.render(simpleDepthShader, lanesArray, VAO, VAOSafeLane, car, truck, coin, tree);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 };
 
 // Static

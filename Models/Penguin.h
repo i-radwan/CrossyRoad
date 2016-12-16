@@ -20,11 +20,11 @@ public:
         return std::abs(a - b) < epsilon;
     }
     
-    void movePenguinTowardsTarget(float deltaTime, vector<lane> &lanesArray) {
+    void movePenguinTowardsTarget(float deltaTime, vector<Lane> &lanesArray) {
         if (isMoving) {
             if (double_equals(this->targetZ, this->penZ)) {
                 isMoving = false;
-                if (lanesArray[this->currentLaneIndex].type == 0) {
+                if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
                     this->penY = constantPenY;
                 } else
                     this->penY = constantPenY - 0.2;
@@ -71,7 +71,7 @@ public:
     }
     void draw(glm::mat4 cameraViewMat, GLfloat cameraZoom, float hwRatio,
               float near, float far, GLuint frameCount, bool moving,
-              float deltaTime, vector<lane> &lanesArray) {
+              float deltaTime, vector<Lane> &lanesArray) {
         movePenguinTowardsTarget(deltaTime, lanesArray);
         shader.Use();
         glm::vec3 lightCol = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -120,7 +120,7 @@ public:
                            moving || this->isMoving);
     }
     
-    void Render(Shader& depthShader ,GLuint frameCount, bool moving,float deltaTime, vector<lane> &lanesArray){
+    void render(Shader& depthShader ,GLuint frameCount, bool moving,float deltaTime, vector<Lane> &lanesArray){
         movePenguinTowardsTarget(deltaTime, lanesArray);
         //We are using the simpleDepthShader used in the Render Initialization Function
         glm::mat4 objmodel;
@@ -153,12 +153,12 @@ public:
         
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
         //Render the Penguin model
-        penguinModel->Render(depthShader, frameCount, objmodel,
+        penguinModel->render(depthShader, frameCount, objmodel,
                              moving || this->isMoving);
     }
     
     
-    float getNextLaneZ(vector<lane> &lanesArray) {
+    float getNextLaneZ(vector<Lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
             if (double_equals(lanesArray[i].laneZPos, this->penZ)) {
                 this->adjacentLaneIndex = i+1;
@@ -168,7 +168,7 @@ public:
         }
         return this->penZ;
     }
-    float getPreviousLaneZ(vector<lane> &lanesArray) {
+    float getPreviousLaneZ(vector<Lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
             if (i > 0 && double_equals(lanesArray[i].laneZPos, this->penZ)) {
                 this->adjacentLaneIndex = i-1;
@@ -180,7 +180,7 @@ public:
     }
     void move(bool movingForward, bool movingBackward, bool movingRight,
               bool movingLeft, Camera &camera, GLfloat deltaTime,
-              vector<lane> &lanesArray) {
+              vector<Lane> &lanesArray) {
         deltaTime *= 100;
         this->movingForwad = movingForward;
         this->movingRight = movingRight;
@@ -206,7 +206,7 @@ public:
             setPenX(getPenX() - penguinSpeed * deltaTime);
         }
     }
-    collisionStatus detectCollision(vector<lane> &lanesArray) {
+    collisionStatus detectCollision(vector<Lane> &lanesArray) {
         bool carCollided = false;
         bool coinCollided = false;
         float penRightPos = getPenX() + (1.492 * 0.13);

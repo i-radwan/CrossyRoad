@@ -5,11 +5,22 @@
 #include "../Models/Car.h"
 
 using namespace std;
+static enum LaneType {
+    SAFE_LANE, NORMAL_LANE
+};
+class Constants {
+public:
+    constexpr static const GLfloat TREE_Y = 0.432f;
+    constexpr static const GLfloat CAR_Y = 1.065;
+    constexpr static const GLfloat TRUCK_Y = 0.45;
+    constexpr static const GLfloat COIN_Y = 1.2;
+    constexpr static const GLuint SHADOW_WIDTH = 4400;
+    constexpr static const GLuint SHADOW_HEIGHT = 4000;
 
-
-struct lane {
+};
+struct Lane {
     float laneZPos;
-    int type;
+    LaneType type;
     bool drawnBefore = 0;
     bool isVisited = false;
     bool isTruck = false;
@@ -19,17 +30,37 @@ struct lane {
     bool isCoinConsumed = false;
     float treeXpos = -3;
     bool treeDrawn = 0;
-    lane(){
+    Lane(){
         setTreeXPos();
+        
     }
     void setTreeXPos(){
         // 77 is the first number popped in my mind, ther is no scientific reason behind.
         treeXpos = ( (rand() * rand() * rand() * rand())%77 * (rand() > 6 ? -1 : 1 ))%15;
     }
+    void setCoinPosition(){
+        if(laneZPos < -4 && !hasCoin && !drawnBefore){
+            GLint randNum = (10 + (rand() % (int)(2000 - 10 + 1)));
+            GLboolean addCoin = (randNum % 3 == 0);
+            if(addCoin){
+                GLfloat coinX = -6 + (rand() % (int)(9 - -6 + 1));
+                if(abs(coinX - treeXpos) > 10){
+                    coinXPosition = coinX;
+                    hasCoin = true;
+                }
+            }
+        }
+    }
     void moveCar (){
         laneCarXPosition += laneCarSpeed;
         if(laneCarXPosition < -25){
             laneCarXPosition =  14 + (rand() % (int)(30 - 14 + 1));
+        }
+    }
+    void rotateCoin(){
+        coinRotation++;
+        if(coinRotation > 360){
+            coinRotation -= 360;
         }
     }
     void setLaneCarSpeed(GLfloat speed){
@@ -50,6 +81,7 @@ private:
 
 
 void generateLaneData(int laneData[]){
+    
     int count[2] = {0,1};
     int randomNumber;
     int maxAllowed[2] = {2,5};
@@ -88,16 +120,17 @@ void generateLaneData(int laneData[]){
 
 class Utilities{
 public:
-    static void generateLanesAlgorithm(vector<lane>& lanesArray) {
-        int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
+    static void generateLanesAlgorithm(vector<Lane>& lanesArray) {
+        int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe Lane, 1 normal Lane
         float laneZ = -1.3;
         for(int i = 0 ;i < 52; i++){
             int random= (1 + rand() % (200 - 1));
             
-            lane s;
-            s.type = lanesData[i];
+            Lane s;
+            s.type = static_cast<LaneType>(lanesData[i]);
             s.drawnBefore = 0;
             s.laneZPos = laneZ;
+            s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
                 s.isTruck = true;
             }
@@ -114,28 +147,28 @@ public:
             
             lanesArray.push_back(s);
             // Z operations
-            if((i < 51 && lanesData[i] == 1 && lanesData[i+1] == 0) || (i < 51 && lanesData[i] == 0 && lanesData[i+1] == 1)){
+            if((i < 51 && lanesData[i] == LaneType::NORMAL_LANE && lanesData[i+1] == LaneType::SAFE_LANE) || (i < 51 && lanesData[i] == LaneType::SAFE_LANE && lanesData[i+1] ==LaneType::NORMAL_LANE)){
                 laneZ -=1.5;
             }
             else{
                 laneZ -= 1;
             }
-            if(i < 51 && lanesData[i] == 1 && lanesData[i+1] == 1){
+            if(i < 51 && lanesData[i] == LaneType::NORMAL_LANE && lanesData[i+1] == LaneType::NORMAL_LANE){
                 laneZ -= 1.1;
             }
             
         }
     }
-    static void addMoreLanes(vector<lane>& lanesArray) {
+    static void addMoreLanes(vector<Lane>& lanesArray) {
         int lanesData[50];
         //autogeneration
         generateLaneData(lanesData);
-        vector<lane> newLanesArray;
+        vector<Lane> newLanesArray;
         GLfloat lastCarSpeed = 0;
         float lastLaneZPos = 0;
         int lastLaneType = 0;
         for(int j = 32, i = 0 ; j < 52; j++, i++){
-            lane s =lanesArray[j];
+            Lane s =lanesArray[j];
             newLanesArray.push_back(s);
             lastCarSpeed = min(lanesArray[j].getLaneCarSpeed(), lastCarSpeed);
             lastLaneZPos = s.laneZPos;
@@ -144,22 +177,23 @@ public:
         for(int i = 0, j = (52-32); i < 32; i++, j++){
             if(i == 0){
                 // Z operations
-                if((lastLaneType == 1 && lanesData[i] == 0) || (lastLaneType == 0 && lanesData[i] == 1)){
+                if((lastLaneType == LaneType::NORMAL_LANE && lanesData[i] == LaneType::SAFE_LANE) || (lastLaneType == LaneType::SAFE_LANE && lanesData[i] == LaneType::NORMAL_LANE)){
                     lastLaneZPos -=1.5;
                 }
                 else{
                     lastLaneZPos -= 1;
                 }
-                if(lastLaneType == 1 && lanesData[i] == 1){
+                if(lastLaneType == LaneType::NORMAL_LANE && lanesData[i] == LaneType::NORMAL_LANE){
                     lastLaneZPos -= 1.1;
                 }
             }
             int random = (1 + rand() % (200 - 1));
             
-            lane s;
-            s.type = lanesData[i];
+            Lane s;
+            s.type = static_cast<LaneType>(lanesData[i]);
             s.drawnBefore = 0;
             s.laneZPos = lastLaneZPos;
+            s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
                 s.isTruck = true;
             }
@@ -171,13 +205,13 @@ public:
             s.setLaneCarXPosition(-25 + (rand() % (int)(25 + 25 + 1)));
             newLanesArray.push_back(s);
             // Z operations
-            if((i < 31 && lanesData[i] == 1 && lanesData[i+1] == 0) || (i < 31 && lanesData[i] == 0 && lanesData[i+1] == 1)){
+            if((i < 31 && lanesData[i] == LaneType::NORMAL_LANE && lanesData[i+1] == LaneType::SAFE_LANE) || (i < 31 && lanesData[i] == LaneType::SAFE_LANE && lanesData[i+1] == LaneType::NORMAL_LANE)){
                 lastLaneZPos -=1.5;
             }
             else{
                 lastLaneZPos -= 1;
             }
-            if(i < 31 && lanesData[i] == 1 && lanesData[i+1] == 1){
+            if(i < 31 && lanesData[i] == LaneType::NORMAL_LANE && lanesData[i+1] == LaneType::NORMAL_LANE){
                 lastLaneZPos -= 1.1;
             }
         }

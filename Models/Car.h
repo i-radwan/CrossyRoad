@@ -39,7 +39,7 @@ public:
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
         carModel->Draw(shader, depthMap);
     }
-    void Render(Shader &depthShader, float carX, float carY, float carZ, bool carRotation){
+    void render(Shader &depthShader, float carX, float carY, float carZ, bool carRotation){
         glm::mat4 objmodel;
         GLint objmodelLoc = glGetUniformLocation(depthShader.Program, "model");
         objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
@@ -52,12 +52,9 @@ public:
             objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         }
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
-        carModel->Render();
+        carModel->render();
     }
 private:
     Shader shader;
-    Model* carModel;
-    GLint speed;
-    GLint xPos;
-    
+    Model* carModel;    
 };

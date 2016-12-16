@@ -26,9 +26,9 @@ public:
         for(GLuint i = 0; i < this->meshes.size(); i++)
             this->meshes[i].Draw(shader, depthMap);
     }
-    void Render(){
+    void render(){
         for(GLuint i = 0; i < this->meshes.size(); i++)
-            this->meshes[i].Render();
+            this->meshes[i].render();
     }
     
 private:

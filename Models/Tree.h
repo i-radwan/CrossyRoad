@@ -1,3 +1,5 @@
+#ifndef TREE
+#define TREE
 #include "../Utilities/shaders.h"
 #include <glm/glm.hpp>
 #include <string>
@@ -36,17 +38,18 @@ public:
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
         treeModel->Draw(shader, depthMap);
     }
-    void Render(Shader &depthShader, float treeX, float treeY, float treeZ){
+    void render(Shader &depthShader, float treeX, float treeY, float treeZ){
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( treeX, treeY, treeZ));
-        objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 0.432f, 0.0f));
+        objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         objmodel = glm::scale(objmodel, glm::vec3(1.5f, 1.5f, 1.5f));
         GLint objmodelLoc = glGetUniformLocation(depthShader.Program, "model");
         glUniformMatrix4fv(objmodelLoc, 1, GL_FALSE, glm::value_ptr(objmodel));
-        treeModel->Render();
+        treeModel->render();
     }
 
 private:
     Shader shader;
     Model* treeModel;
 };
+#endif
