@@ -17,9 +17,7 @@ public:
         glUniform3fv(glGetUniformLocation(shader.Program, "viewPos"), 1, &camera.Position[0]);
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
         
-        // Enable/Disable shadows by pressing 'SPACE'
         glUniform1i(glGetUniformLocation(shader.Program, "shadows"), shadows);
-        
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( coinX, 1.6, coinZ)); // ToDo use coinY

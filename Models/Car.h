@@ -18,10 +18,8 @@ public:
         glUniform3fv(glGetUniformLocation(shader.Program, "viewPos"), 1, &camera.Position[0]);
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
         
-        // Enable/Disable shadows by pressing 'SPACE'
         glUniform1i(glGetUniformLocation(shader.Program, "shadows"), shadows);
 
-        
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
         objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
@@ -44,12 +42,11 @@ public:
     void Render(Shader &depthShader, float carX, float carY, float carZ, bool carRotation){
         glm::mat4 objmodel;
         GLint objmodelLoc = glGetUniformLocation(depthShader.Program, "model");
+        objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
         if(carRotation){ // Means small car
-            objmodel = glm::translate(objmodel, glm::vec3( carX, carY, carZ));
             objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));
         } else{ // Means truck
-            objmodel = glm::translate(objmodel, glm::vec3( carX, 0.5, carZ));
             objmodel = glm::rotate(objmodel, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             objmodel = glm::rotate(objmodel, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             objmodel = glm::scale(objmodel, glm::vec3(0.008f, 0.008f, 0.008f));

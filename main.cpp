@@ -24,6 +24,7 @@ Camera camera(glm::vec3(0.0f, 4.0f, 5.0f));
 const GLuint SHADOW_WIDTH = 4400, SHADOW_HEIGHT = 4000;
 const GLint gameWidth = 750;
 const GLint gameHeight = 800;
+
 long score = 0;
 bool gameOver = false;
 bool exitGame = false;
@@ -83,7 +84,7 @@ int main(int argc, const char * argv[]) {
     float newStart = -1.3;
     // Generate lanes
     vector<lane> lanesArray;
-    Utilities::generateLanesAlgorithm(lanesArray);
+    Utilities::generateLanesAlgorithm(lanesArray, newStart);
     
     // Some variables for game logic go here::
     GLuint frameCount = 0;
