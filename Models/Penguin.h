@@ -160,26 +160,26 @@ public:
     
     float getNextLaneZ(vector<lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
-            if (double_equals(lanesArray[i].startPos, this->penZ)) {
+            if (double_equals(lanesArray[i].laneZPos, this->penZ)) {
                 this->adjacentLaneIndex = i+1;
                 this->isMovedToAdjacentLane = false;
-                return lanesArray[i + 1].startPos;
+                return lanesArray[i + 1].laneZPos;
             }
         }
         return this->penZ;
     }
     float getPreviousLaneZ(vector<lane> &lanesArray) {
         for (int i = 0; i < lanesArray.size(); i++) {
-            if (i > 0 && double_equals(lanesArray[i].startPos, this->penZ)) {
+            if (i > 0 && double_equals(lanesArray[i].laneZPos, this->penZ)) {
                 this->adjacentLaneIndex = i-1;
                 this->isMovedToAdjacentLane = false;
-                return lanesArray[i - 1].startPos;
+                return lanesArray[i - 1].laneZPos;
             }
         }
         return this->penZ;
     }
     void move(bool movingForward, bool movingBackward, bool movingRight,
-              bool movingLeft, Camera &camera, GLfloat deltaTime, float startPos,
+              bool movingLeft, Camera &camera, GLfloat deltaTime,
               vector<lane> &lanesArray) {
         deltaTime *= 100;
         this->movingForwad = movingForward;
@@ -192,7 +192,7 @@ public:
             this->initalZ = this->penZ;
         }
         if (movingBackward && !isMoving) {
-            if (getPenZ() <= startPos - 3) {
+            if (getPenZ() <= lanesArray[0].laneZPos - 3) {
                 this->isMoving = true; // Set penguin status to moving
                 this->targetZ = getPreviousLaneZ(lanesArray);
                 this->initalZ = this->penZ;

@@ -8,7 +8,6 @@ using namespace std;
 
 
 struct lane {
-    float startPos;
     float laneZPos;
     int type;
     bool drawnBefore = 0;
@@ -18,7 +17,6 @@ struct lane {
     float coinXPosition = 0;
     float coinRotation = 0;
     bool isCoinConsumed = false;
-    //Note that the Z coordinate is the startPos of the lane + some offset
     float treeXpos = -3;
     bool treeDrawn = 0;
     lane(){
@@ -90,7 +88,7 @@ void generateLaneData(int laneData[]){
 
 class Utilities{
 public:
-    static void generateLanesAlgorithm(vector<lane>& lanesArray, float startZ) {
+    static void generateLanesAlgorithm(vector<lane>& lanesArray) {
         int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe lane, 1 normal lane
         float laneZ = -1.3;
         for(int i = 0 ;i < 52; i++){
@@ -98,7 +96,6 @@ public:
             
             lane s;
             s.type = lanesData[i];
-            s.startPos = 0;
             s.drawnBefore = 0;
             s.laneZPos = laneZ;
             if(random % 3 == 1 || random % 5 == 1 ){
@@ -129,7 +126,7 @@ public:
             
         }
     }
-    static void addMoreLanes(vector<lane>& lanesArray, float &newstart) {
+    static void addMoreLanes(vector<lane>& lanesArray) {
         int lanesData[50];
         //autogeneration
         generateLaneData(lanesData);
@@ -160,7 +157,6 @@ public:
             int random = (1 + rand() % (200 - 1));
             
             lane s;
-            s.startPos = 0;
             s.type = lanesData[i];
             s.drawnBefore = 0;
             s.laneZPos = lastLaneZPos;
@@ -187,7 +183,6 @@ public:
         }
         lanesArray.clear();
         lanesArray = newLanesArray;
-        newstart = lanesArray[0].startPos;
     }
     
 };

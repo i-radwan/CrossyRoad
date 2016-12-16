@@ -41,7 +41,7 @@ GLuint quadVAO = 0;
 GLuint quadVBO;
 
 
-void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, float &newStart, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane);
+void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane);
 
 int main(int argc, const char * argv[]) {
     
@@ -80,11 +80,9 @@ int main(int argc, const char * argv[]) {
     Coin coin(textureShader ,"/Users/ibrahimradwan/Desktop/coin/Gems/diamond_orange.obj");
     Tree tree(textureShader, "/Users/ibrahimradwan/Desktop/Tree/tree_4.obj");
     
-    
-    float newStart = -1.3;
     // Generate lanes
     vector<lane> lanesArray;
-    Utilities::generateLanesAlgorithm(lanesArray, newStart);
+    Utilities::generateLanesAlgorithm(lanesArray);
     
     // Some variables for game logic go here::
     GLuint frameCount = 0;
@@ -135,7 +133,7 @@ int main(int argc, const char * argv[]) {
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         
         //Call Render Everything functuion
-        RenderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, newStart, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane);
+        RenderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane);
         
         //Update the Light Pos And the Light Look at
         lz = penguin.getPenZ() + 8.3;
@@ -152,17 +150,17 @@ int main(int argc, const char * argv[]) {
         
         // Penguin drawing
         graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart, lanesArray);
+        penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
         
         // penguin drawing
         penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars + Diamonds + trees)
-        gameScene.draw(lightSpaceMatrix, depthMap, camera, lightPos, shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, newStart, car, truck, coin, tree);
+        gameScene.draw(lightSpaceMatrix, depthMap, camera, lightPos, shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
-        if (penguin.getPenZ() < lanesArray[34].startPos){
-            Utilities::addMoreLanes(lanesArray, newStart);
+        if (penguin.getPenZ() < lanesArray[34].laneZPos){
+            Utilities::addMoreLanes(lanesArray);
             penguin.setCurrentLaneIndex(4);
         }
         // Check for collisions
@@ -205,7 +203,7 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, float &newStart, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane){
+void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm::mat4  &lightView, glm::mat4 &lightSpaceMatrix,GLfloat &near_plane ,GLfloat &far_plane, GameScene &gameScene, Penguin &penguin,bool &movingForward,bool &movingBackward, bool &movingRight,bool &movingLeft, vector<lane> &lanesArray,GLuint &frameCount,GLfloat &deltaTime, GLuint &depthMapFBO, GLuint &depthMap, GraphicsUtilities &graphicsUtilities, Car &car, Car &truck, Coin &coin,Tree &tree, GLuint &VAO, GLuint  &VAOSafeLane){
     
     lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
     lightView = glm::lookAt(lightPos, glm::vec3(ax, ay, az), glm::vec3(0.0, 1.0, 0.0));
@@ -219,9 +217,9 @@ void RenderEverything(Shader &simpleDepthShader, glm::mat4 &lightProjection,glm:
     glClear(GL_DEPTH_BUFFER_BIT);
     //Render The Penguin
     graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-    penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, newStart, lanesArray);
+    penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
     penguin.Render(simpleDepthShader, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
     //Render Gamescene(Lanes, Coins, Trees, Cars)
-    gameScene.Render(simpleDepthShader, lanesArray, newStart, VAO, VAOSafeLane, car, truck, coin, tree);
+    gameScene.Render(simpleDepthShader, lanesArray, VAO, VAOSafeLane, car, truck, coin, tree);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
