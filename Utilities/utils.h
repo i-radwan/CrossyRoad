@@ -9,15 +9,35 @@ using namespace std;
 
 struct lane{
     float startPos;
+    float zpos;
     int type;
     bool drawnBefore = 0;
     bool isVisited = false;
     bool isTruck = false;
     bool hasCoin = false;
-    float coinXPosition = -1;
+    float coinXPosition = 0;
     float coinRotation = 0;
     bool isCoinConsumed = false;
+    //Note that the Z coordinate is the startPos of the lane + some offset
+    float treeXpos = -3;
+    bool treeDrawn = 0;
     lane(){
+        setTreeXPos();
+        setCoinPosition();
+    }
+    void setTreeXPos(){
+        // 77 is the first number popped in my mind, ther is no scientific reason behind.
+        treeXpos = ( (rand() * rand() * rand() * rand())%77 * (rand() > 6 ? -1 : 1 ))%15;
+    }
+    void setCoinPosition(){
+        
+        // ToDo check for tree
+        GLint randNum = (10 + (rand() % (int)(2000 - 10 + 1)));
+        GLboolean addCoin = (randNum % 3 == 0);
+        if(zpos < -4 && addCoin && !hasCoin && !drawnBefore){
+            coinXPosition = -6 + (rand() % (int)(9 - -6 + 1));
+            hasCoin = true;
+        }
     }
     void moveCar (){
         laneCarXPosition += laneCarSpeed;

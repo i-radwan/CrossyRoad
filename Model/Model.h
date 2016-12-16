@@ -1,5 +1,6 @@
 #ifndef MODEL
 #define MODEL
+
 #include "Mesh.h"
 
 vector<Texture> all_loaded_textures;
@@ -19,6 +20,15 @@ public:
     {
         for(GLuint i = 0; i < this->meshes.size(); i++)
             this->meshes[i].Draw(shader);
+    }
+    void Draw(Shader shader, GLuint &depthMap)
+    {
+        for(GLuint i = 0; i < this->meshes.size(); i++)
+            this->meshes[i].Draw(shader, depthMap);
+    }
+    void Render(){
+        for(GLuint i = 0; i < this->meshes.size(); i++)
+            this->meshes[i].Render();
     }
     
 private:

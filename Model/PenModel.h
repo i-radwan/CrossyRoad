@@ -26,6 +26,11 @@ public:
         for(GLuint i = 0; i < this->meshes.size(); i++)
             this->meshes[i].Draw(shader, this->modelAnimations, frameCount, objmodel, moving);
     }
+    void Render(Shader &depthShader, GLuint frameCount, glm::mat4 objmodel, bool moving){
+        for(GLuint i = 0; i < this->meshes.size(); i++)
+            this->meshes[i].Render(depthShader, this->modelAnimations, frameCount, objmodel, moving);
+    }
+    
     vector<pair< string, vector<animationData> > > getModelAnimations(){return this->modelAnimations;}
 private:
     /*  Model Data  */
@@ -56,11 +61,11 @@ private:
             aiAnimation* animation = scene->mAnimations[i];
 
             string nodeName =animation->mName.C_Str();
-            cout << "Animation: " << animation->mName.C_Str() << " " << animation->mDuration << endl;
+//            cout << "Animation: " << animation->mName.C_Str() << " " << animation->mDuration << endl;
             
             for (int j = 0; j< animation->mNumChannels; j++) {
                 aiNodeAnim* nodeAnimation = animation->mChannels[j];
-                cout << "Node: " << nodeAnimation->mNodeName.C_Str() << endl;
+//                cout << "Node: " << nodeAnimation->mNodeName.C_Str() << endl;
                 
                 string nodeName = nodeAnimation->mNodeName.C_Str() ;
                 vector<animationData> animData(nodeAnimation->mNumPositionKeys);
@@ -71,21 +76,21 @@ private:
                     animData[k].position.x = position.mValue.x;
                     animData[k].position.y = position.mValue.y;
                     animData[k].position.z = position.mValue.z;
-                    cout << "Position: Time-> " << position.mTime << " x: " << position.mValue.x <<  " y: " << position.mValue.y << " z: "<<  position.mValue.z << endl;
+//                    cout << "Position: Time-> " << position.mTime << " x: " << position.mValue.x <<  " y: " << position.mValue.y << " z: "<<  position.mValue.z << endl;
                 }
                 for (int k = 0; k < nodeAnimation->mNumRotationKeys; k++) {
                     aiQuatKey rotating = nodeAnimation->mRotationKeys[k];
                     animData[k].rotation.x = rotating.mValue.x;
                     animData[k].rotation.y = rotating.mValue.y;
                     animData[k].rotation.z = rotating.mValue.z;
-                    cout << "Rotating: Time-> " << rotating.mTime << " x: " << rotating.mValue.x <<  " y: " << rotating.mValue.y << " z: " << rotating.mValue.z<< " w: " << rotating.mValue.w << endl;
+//                    cout << "Rotating: Time-> " << rotating.mTime << " x: " << rotating.mValue.x <<  " y: " << rotating.mValue.y << " z: " << rotating.mValue.z<< " w: " << rotating.mValue.w << endl;
                 }
                 for (int k = 0; k < nodeAnimation->mNumScalingKeys; k++) {
                     aiVectorKey scale = nodeAnimation->mScalingKeys[k];
                     animData[k].scaling.x = scale.mValue.x;
                     animData[k].scaling.y = scale.mValue.y;
                     animData[k].scaling.z = scale.mValue.z;
-                    cout << "Scale: Time-> " << scale.mTime << " x: " << scale.mValue.x <<  " y: "<<  scale.mValue.y << " z: "<<  scale.mValue.z << endl;
+//                    cout << "Scale: Time-> " << scale.mTime << " x: " << scale.mValue.x <<  " y: "<<  scale.mValue.y << " z: "<<  scale.mValue.z << endl;
                 }
                 modelAnimations.push_back(make_pair(nodeName, animData));
                 cout << endl<<endl;

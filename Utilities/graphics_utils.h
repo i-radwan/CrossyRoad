@@ -7,6 +7,9 @@
 #include "camera.h"
 #include "../Utilities/utils.h"
 #include "../Models/Penguin.h"
+#include "shaders.h"
+#include <irrKlang/irrKlang.h>
+
 using namespace std;
 
 enum penguinMovement{
@@ -22,11 +25,11 @@ private:
                              int mode)
     {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
+            glfwSetWindowShouldClose(window, GL_TRUE);
         if(action == GLFW_PRESS)
-        keys[key] = true;
+            keys[key] = true;
         else if(action == GLFW_RELEASE)
-        keys[key] = false;
+            keys[key] = false;
     }
     void static mouse_callback(GLFWwindow* window, double xpos, double ypos){
         if(firstMouse)
@@ -98,31 +101,34 @@ public:
             cout << "Failed to initialize GLEW" << endl;
             return -1;
         }
+        // Setup some OpenGL options
         glEnable(GL_DEPTH_TEST);
+        // Define the viewport dimensions //TODO Ya Samra
+        //glViewport(0, 0, gameWidth*2, gameHeight*2);
         return 0;
     }
     penguinMovement do_movement(GLfloat deltaTime, bool& movingForward, bool& movingBackward, bool& movingRight, bool& movingLeft)
     {
         if(keys[GLFW_KEY_W])
-        camera->ProcessKeyboard(FORWARD, deltaTime);
+            camera->ProcessKeyboard(FORWARD, deltaTime);
         if(keys[GLFW_KEY_S])
-        camera->ProcessKeyboard(BACKWARD, deltaTime);
+            camera->ProcessKeyboard(BACKWARD, deltaTime);
         if(keys[GLFW_KEY_A])
-        camera->ProcessKeyboard(LEFT, deltaTime);
+            camera->ProcessKeyboard(LEFT, deltaTime);
         if(keys[GLFW_KEY_D])
-        camera->ProcessKeyboard(RIGHT, deltaTime);
+            camera->ProcessKeyboard(RIGHT, deltaTime);
         if(keys[GLFW_KEY_UP])
-        movingForward = true;
+            movingForward = true;
         if(keys[GLFW_KEY_DOWN])
-        movingBackward = true;
+            movingBackward = true;
         if(keys[GLFW_KEY_RIGHT])
-        movingRight = true;
+            movingRight = true;
         if(keys[GLFW_KEY_LEFT])
-        movingLeft = true;
+            movingLeft = true;
         return NO_MOVEMENT;
     }
     
-    void score(vector<lane> &lanesArray, long &score, Penguin* pen) {
+    void score(vector<lane> &lanesArray, long &score, Penguin* pen, irrklang::ISoundEngine* engine) {
         bool isCollided = false;
         float penRightPos = pen->getPenX() + (1.492 * 0.13);
         float penLeftPos = pen->getPenX() - (1.492 * 0.13);
@@ -144,7 +150,9 @@ public:
             if ((penRightPos >= coinLeftPos) && (penLeftPos < coinRightPos)) {
                 isCollided = true;
             }
-            if(isCollided) lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
+            if(isCollided) {lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
+            engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/346404__robinhood76__06698-gem-collect-ding.wav");
+            }
         }
         //adding +100 to score if collided with a coin
         if (isCollided) {
@@ -205,6 +213,59 @@ public:
         glBindVertexArray(0);
         
     }
+    void RenderQuad(Shader &debugDepthQuad, GLuint &quadVAO, GLuint &quadVBO,GLfloat near_plane, GLfloat far_plane, GLuint &depthMap)
+    {
+        // 3. DEBUG: visualize depth map by rendering it to plane
+        debugDepthQuad.Use();
+        glUniform1f(glGetUniformLocation(debugDepthQuad.Program, "near_plane"), near_plane);
+        glUniform1f(glGetUniformLocation(debugDepthQuad.Program, "far_plane"), far_plane);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        //               RenderQuad(); // uncomment this line to see depth map
+        if (quadVAO == 0)
+        {
+            GLfloat quadVertices[] = {
+                // Positions        // Texture Coords
+                -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+                -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+                1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+                1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+            };
+            // Setup plane VAO
+            glGenVertexArrays(1, &quadVAO);
+            glGenBuffers(1, &quadVBO);
+            glBindVertexArray(quadVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        }
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindVertexArray(0);
+    }
+    void DepthMapInitialization(GLuint &depthMapFBO, GLuint &depthMap,GLuint SHADOW_WIDTH = 4000, GLuint SHADOW_HEIGHT = 4000){
+        glGenFramebuffers(1, &depthMapFBO);
+        // - Create depth texture
+        glGenTextures(1, &depthMap);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+   
 };
 
 // Static
