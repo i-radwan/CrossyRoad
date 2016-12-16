@@ -15,10 +15,10 @@ public:
         {
             if(lanesArray[i].type == 1){
                 if(!lanesArray[i].isTruck){
-                    car.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 1.3, zpos, true);
+                    car.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 0.865, zpos, true);
                 }
                 else{
-                    truck.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 1.3, zpos, false);
+                    truck.draw(cameraViewMat, cameraZoom, hwRatio, near, far, lanesArray[i].getLaneCarXPosition(), 0.3, zpos, false);
                 }
                 lanesArray[i].moveCar();
             }

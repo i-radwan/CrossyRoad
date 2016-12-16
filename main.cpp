@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]) {
     GameScene gameScene(sceneShader);
     // Load MODELS
     Penguin penguin(materialShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
-    penguin.setPenPosition(0, 1.4f, -3.3f); // Set initial posisiton
+    penguin.setPenPosition(0, penguin.getPenguinConstantY(), -3.3f); // Set initial posisiton
     Car car(textureShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
     Car truck(textureShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
     Coin coin(textureShader ,"/Users/ibrahimradwan/Desktop/coin/Gems/diamond_orange.obj");

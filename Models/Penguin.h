@@ -261,9 +261,12 @@ public:
     void setCurrentLaneIndex(int currentLane){
         this->currentLaneIndex = currentLane;
     }
+    float getPenguinConstantY(){
+        return constantPenY;
+    }
 private:
     const float penguinSpeed = 0.07f;
-    const float constantPenY = 1.4f;
+    const float constantPenY = 1.13f;
     Shader shader;
     Camera& camera;
     PenModel* penguinModel;
