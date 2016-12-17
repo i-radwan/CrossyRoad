@@ -30,9 +30,20 @@ public:
                     this->penY = constantPenY - 0.35;
                 // Handle continous click
                 if (this->movingForwad) {
-                    this->isMoving = true; // Set penguin status to moving
-                    this->targetZ = getNextLaneZ(lanesArray);
-                    this->initalZ = this->penZ;
+                    float target =getNextLaneZ(lanesArray);
+                    if(!double_equals(target, 0)){ // no tree
+                        this->isMoving = true; // Set penguin status to moving
+                        this->targetZ =target;
+                        this->initalZ = this->penZ;
+                    }
+                }
+                if (this->movingBackward) {
+                    float target =getPreviousLaneZ(lanesArray);
+                    if(!double_equals(target, 0)){ // no tree
+                        this->isMoving = true; // Set penguin status to moving
+                        this->targetZ = target;
+                        this->initalZ = this->penZ;
+                    }
                 }
             }
             if (!double_equals(this->targetZ, this->penZ)
@@ -187,7 +198,7 @@ public:
         this->movingBackward = movingBackward;
         if (movingForward && !isMoving) {
             float target =getNextLaneZ(lanesArray);
-            if(target != 0){ // no tree
+            if(!double_equals(target, 0)){ // no tree
                 this->isMoving = true; // Set penguin status to moving
                 this->targetZ =target;
                 this->initalZ = this->penZ;
@@ -196,20 +207,30 @@ public:
         if (movingBackward && !isMoving) {
             if (getPenZ() <= lanesArray[0].laneZPos - 3) {
                 float target =getPreviousLaneZ(lanesArray);
-                if(target != 0){
+                if(!double_equals(target, 0)){
                     this->isMoving = true; // Set penguin status to moving
                     this->targetZ = target;
                     this->initalZ = this->penZ;
                 }
             }
         }
-        if (movingRight && getPenX() < 9.5 && (((lanesArray[this->currentLaneIndex].type == SAFE_LANE && abs(lanesArray[currentLaneIndex].treeXpos - getPenX()) > 1)) || lanesArray[this->currentLaneIndex].type == NORMAL_LANE)
-            ) {
-            setPenX(getPenX() + penguinSpeed * deltaTime);
+        if (movingRight && getPenX() < 9.5) {
+            
+            if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
+                && (
+                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
+                    ) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                setPenX(getPenX() + penguinSpeed * deltaTime);
+            }
             
         }
-        if (movingLeft && getPenX() > -7 && (((lanesArray[this->currentLaneIndex].type == SAFE_LANE && abs(lanesArray[currentLaneIndex].treeXpos - getPenX()) > 1)) || lanesArray[this->currentLaneIndex].type == NORMAL_LANE)) {
-            setPenX(getPenX() - penguinSpeed * deltaTime);
+        if (movingLeft && getPenX() > -7) {
+            if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
+               && (
+               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
+               ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                setPenX(getPenX() - penguinSpeed * deltaTime);
+            }
         }
     }
     collisionStatus detectCollision(vector<Lane> &lanesArray) {

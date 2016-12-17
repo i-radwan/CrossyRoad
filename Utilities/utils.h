@@ -55,7 +55,7 @@ struct Lane {
     void moveCar (){
         laneCarXPosition += laneCarSpeed;
         if(laneCarXPosition < -25){
-            laneCarXPosition =  14 + (rand() % (int)(30 - 14 + 1));
+            laneCarXPosition =  15 + (rand() % (int)(30 - 15 + 1));
         }
     }
     void rotateCoin(){
