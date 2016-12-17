@@ -113,7 +113,7 @@ int main(int argc, const char * argv[]) {
         lastFrame = currentFrame;
         
         
-        // 1. Render depth of scene to texture (from light's perspective)
+        //Render depth of scene to texture (from light's perspective)
         //Get light projection view matrix
         glm::mat4 lightProjection, lightView;
         glm::mat4 lightSpaceMatrix;
