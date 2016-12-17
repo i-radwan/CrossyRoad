@@ -17,10 +17,12 @@ public:
         penguinModel = new PenModel(modelLink);
     }
     
-    
+    int fCount = 0;
     void movePenguinTowardsTarget(float deltaTime, vector<Lane> &lanesArray) {
         if (isMoving) {
             if (Utilities::double_equals(this->targetZ, this->penZ)) {
+//                cout << "EQUAL" << fCount << "WHERE CLANE " <<  lanesArray[this->currentLaneIndex].type << " NLANE " << lanesArray[this->currentLaneIndex+1].type << " PLANE " << lanesArray[this->currentLaneIndex-1].type <<endl;
+                fCount = 0;
                 isMoving = false;
                 if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
                     this->penY = constantPenY;
@@ -56,6 +58,7 @@ public:
                 }
                 else
                     this->penY += 0.07f;
+                fCount++;
                 // Move the penguin
                 this->penZ -= penguinSpeed;
                 // Move camera
@@ -290,43 +293,48 @@ public:
     /*******************
      TESTING
      ******************/
-    collisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray) {
+    collisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray, float framesNumber) {
+        float absSpeed = abs(lanesArray[getCurrentLane()].getLaneCarSpeed());
+//        if(absSpeed > 0.3){
+//            framesNumber *= 1.75f;
+//        }
+//        else if(absSpeed > 0.275){
+//            framesNumber *= 1.7f;
+//        }
+//        else if(absSpeed > 0.25){
+//            framesNumber *= 1.65f;
+//        }
+//        else if(absSpeed > 0.225){
+//            framesNumber *= 1.6f;
+//        }
+//        else if(absSpeed > 0.2){
+//            framesNumber *= 1.3f;
+//        }
+//        else
+            if(absSpeed > 0.1){
+            //framesNumber *= 1.1f;
+        }
+        cout << " FOR LANE " << getCurrentLane() << " AS " << lanesArray[getCurrentLane()].type << " AND FRAMES "<< framesNumber << " POSITION OLD " <<lanesArray[getCurrentLane()].getLaneCarXPosition() <<" NEW POSITION " << lanesArray[getCurrentLane()].getLaneCarXPosition() + framesNumber * lanesArray[getCurrentLane()].getLaneCarSpeed() <<endl;
+        
+        cout <<"MODIFIED FRAMES "<<framesNumber << " ABS " <<absSpeed<<endl;
         bool carCollided = false;
         bool coinCollided = false;
         float penRightPos = getPenX() + (1.492 * 0.13);
         float penLeftPos = getPenX() - (1.492 * 0.13);
         float carRightPos, carLeftPos;
-        float coinRightPos, coinLeftPos;
-        //collision with coins
-        if (lanesArray[getCurrentLane()].hasCoin) {
-            coinRightPos = lanesArray[getCurrentLane()].coinXPosition + 0.4;
-            coinLeftPos = lanesArray[getCurrentLane()].coinXPosition - 0.4;
-            
-            if ((penLeftPos < coinRightPos)
-                && (penRightPos >= coinLeftPos) || (penRightPos >= coinLeftPos)
-                && (penLeftPos < coinRightPos)) {
-                
-                coinCollided = true;
-                
-            }
-            if (coinCollided) {
-                return coinCollision;
-            }
-        }
+        
         //collision with cars
         if (lanesArray[getCurrentLane()].type) {
-            
+            float newCarCenter = lanesArray[getCurrentLane()].getLaneCarXPosition() + framesNumber * lanesArray[getCurrentLane()].getLaneCarSpeed();
             if (!lanesArray[getCurrentLane()].isTruck) {
                 //is car
-                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                + (102.966 * 0.008) + 0.9 +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
-                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                - (102.966 * 0.008) - 0.75  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+                carRightPos = newCarCenter + (102.966 * 0.008) + 0.9;
+                carLeftPos = newCarCenter - (102.966 * 0.008) - 0.75;
             } else { //is truck
-                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                + (312.692 * 0.008) + 0.15  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
-                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                - (312.692 * 0.008) - 0.4  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+//                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+//                + (312.692 * 0.008) + 0.15;
+//                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+//                - (312.692 * 0.008) - 0.4;
             }
             //collision with car's behind
             
