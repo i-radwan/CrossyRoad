@@ -16,13 +16,11 @@ public:
     shader(shader), camera(c) {
         penguinModel = new PenModel(modelLink);
     }
-    bool double_equals(double a, double b, double epsilon = 0.1) {
-        return std::abs(a - b) < epsilon;
-    }
+    
     
     void movePenguinTowardsTarget(float deltaTime, vector<Lane> &lanesArray) {
         if (isMoving) {
-            if (double_equals(this->targetZ, this->penZ)) {
+            if (Utilities::double_equals(this->targetZ, this->penZ)) {
                 isMoving = false;
                 if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
                     this->penY = constantPenY;
@@ -31,7 +29,7 @@ public:
                 // Handle continous click
                 if (this->movingForwad) {
                     float target =getNextLaneZ(lanesArray);
-                    if(!double_equals(target, 0)){ // no tree
+                    if(!Utilities::double_equals(target, 0)){ // no tree
                         this->isMoving = true; // Set penguin status to moving
                         this->targetZ =target;
                         this->initalZ = this->penZ;
@@ -39,14 +37,14 @@ public:
                 }
                 if (this->movingBackward) {
                     float target =getPreviousLaneZ(lanesArray);
-                    if(!double_equals(target, 0)){ // no tree
+                    if(!Utilities::double_equals(target, 0)){ // no tree
                         this->isMoving = true; // Set penguin status to moving
                         this->targetZ = target;
                         this->initalZ = this->penZ;
                     }
                 }
             }
-            if (!double_equals(this->targetZ, this->penZ)
+            if (!Utilities::double_equals(this->targetZ, this->penZ)
                 && this->targetZ < this->penZ) {
                 // Jump the penguin
                 if (this->targetZ - this->penZ > (this->penZ - this->initalZ)){
@@ -63,7 +61,7 @@ public:
                 // Move camera
                 glm::vec3 v(0, 0, -penguinSpeed);
                 camera.updateCameraPos(v);
-            } else if (!double_equals(this->targetZ, this->penZ)
+            } else if (!Utilities::double_equals(this->targetZ, this->penZ)
                        && this->targetZ > this->penZ) {
                 if (this->targetZ - this->penZ > (this->penZ - this->initalZ))
                     this->penY += 0.15f;
@@ -198,7 +196,7 @@ public:
         this->movingBackward = movingBackward;
         if (movingForward && !isMoving) {
             float target =getNextLaneZ(lanesArray);
-            if(!double_equals(target, 0)){ // no tree
+            if(!Utilities::double_equals(target, 0)){ // no tree
                 this->isMoving = true; // Set penguin status to moving
                 this->targetZ =target;
                 this->initalZ = this->penZ;
@@ -207,7 +205,7 @@ public:
         if (movingBackward && !isMoving) {
             if (getPenZ() <= lanesArray[0].laneZPos - 3) {
                 float target =getPreviousLaneZ(lanesArray);
-                if(!double_equals(target, 0)){
+                if(!Utilities::double_equals(target, 0)){
                     this->isMoving = true; // Set penguin status to moving
                     this->targetZ = target;
                     this->initalZ = this->penZ;
@@ -220,17 +218,17 @@ public:
                 && (
                     abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
                     ) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
-                setPenX(getPenX() + penguinSpeed * deltaTime);
-            }
+                    setPenX(getPenX() + penguinSpeed * deltaTime);
+                }
             
         }
         if (movingLeft && getPenX() > -7) {
             if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
-               && (
-               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
-               ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
-                setPenX(getPenX() - penguinSpeed * deltaTime);
-            }
+                && (
+                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
+                    ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                    setPenX(getPenX() - penguinSpeed * deltaTime);
+                }
         }
     }
     collisionStatus detectCollision(vector<Lane> &lanesArray) {
@@ -289,6 +287,66 @@ public:
         return noCollision;
     }
     
+    /*******************
+     TESTING
+     ******************/
+    collisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray) {
+        bool carCollided = false;
+        bool coinCollided = false;
+        float penRightPos = getPenX() + (1.492 * 0.13);
+        float penLeftPos = getPenX() - (1.492 * 0.13);
+        float carRightPos, carLeftPos;
+        float coinRightPos, coinLeftPos;
+        //collision with coins
+        if (lanesArray[getCurrentLane()].hasCoin) {
+            coinRightPos = lanesArray[getCurrentLane()].coinXPosition + 0.4;
+            coinLeftPos = lanesArray[getCurrentLane()].coinXPosition - 0.4;
+            
+            if ((penLeftPos < coinRightPos)
+                && (penRightPos >= coinLeftPos) || (penRightPos >= coinLeftPos)
+                && (penLeftPos < coinRightPos)) {
+                
+                coinCollided = true;
+                
+            }
+            if (coinCollided) {
+                return coinCollision;
+            }
+        }
+        //collision with cars
+        if (lanesArray[getCurrentLane()].type) {
+            
+            if (!lanesArray[getCurrentLane()].isTruck) {
+                //is car
+                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+                + (102.966 * 0.008) + 0.9 +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+                - (102.966 * 0.008) - 0.75  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+            } else { //is truck
+                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+                + (312.692 * 0.008) + 0.15  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
+                - (312.692 * 0.008) - 0.4  +  lanesArray[getCurrentLane()].getLaneCarSpeed() * 5;
+            }
+            //collision with car's behind
+            
+            if ((penLeftPos < carRightPos) && (penRightPos >= carLeftPos) && this->penY < constantPenY - 0.2 + 0.4) {
+                carCollided = true;
+                
+            }
+            //collision with car's front
+            if ((penRightPos >= carLeftPos) && (penLeftPos < carRightPos) && this->penY < constantPenY - 0.2 + 0.4) {
+                carCollided = true;
+            }
+        }
+        if (carCollided) {
+            return carCollision;
+        }
+        
+        return noCollision;
+    }
+    
+
     void setPenPosition(float penX, float penY, float penZ) {
         this->penX = penX;
         this->penY = penY;
@@ -329,14 +387,15 @@ public:
     
     const GLfloat penguinSpeed = 0.04f;
     const GLfloat constantPenY = 1.35f;
+    bool movingForwad = false, movingRight = false, movingLeft = false,    movingBackward = false;
+    GLboolean isMoving = false;
+    
+    
 private:
     Shader shader;
     Camera& camera;
     PenModel* penguinModel;
     GLfloat penX, penY, penZ, targetZ, initalZ;
-    GLboolean isMoving = false;
-    bool movingForwad = false, movingRight = false, movingLeft = false,
-    movingBackward = false;
     int currentLaneIndex = 2;
     int adjacentLaneIndex;
     bool isMovedToAdjacentLane = false;

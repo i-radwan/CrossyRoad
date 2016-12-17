@@ -121,6 +121,9 @@ void generateLaneData(int laneData[]){
 
 class Utilities{
 public:
+    static bool double_equals(double a, double b, double epsilon = 0.1) {
+        return std::abs(a - b) < epsilon;
+    }
     static void generateLanesAlgorithm(vector<Lane>& lanesArray) {
         int lanesData[] = {0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0 ,1 ,1,  1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0}; // 0 safe Lane, 1 normal Lane
         float laneZ = -1.3;
@@ -133,7 +136,7 @@ public:
             s.laneZPos = laneZ;
             s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
-                s.isTruck = true;
+//                s.isTruck = true;
             }
             // Set speed ToDo fix this
             if(i <= 20 == 0){
@@ -196,7 +199,7 @@ public:
             s.laneZPos = lastLaneZPos;
             s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
-                s.isTruck = true;
+//                s.isTruck = true;
             }
             if(i <= 20){
                 s.setLaneCarSpeed(s.getLaneCarSpeed() + (lastCarSpeed - (i + 1) * 0.001));
