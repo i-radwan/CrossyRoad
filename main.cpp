@@ -35,7 +35,7 @@ GLuint quadVAO = 0;
 GLuint quadVBO;
 
 int main(int argc, const char * argv[]) {
-    
+    srand( time( NULL ) );
     // initialize game
     GraphicsUtilities graphicsUtilities(&camera);
     if(0 != graphicsUtilities.initializeGameWindow(Constants::gameWidth, Constants::gameHeight, 3, 3, window)){
