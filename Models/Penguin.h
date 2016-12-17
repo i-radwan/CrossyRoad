@@ -1,10 +1,10 @@
 #ifndef PENGUIN
 #define PENGUIN
-
 #include "../Utilities/shaders.h"
 #include "../Model/PenModel.h"
 #include <glm/glm.hpp>
 #include <string>
+
 using namespace std;
 enum collisionStatus {
     carCollision, coinCollision, noCollision
@@ -27,7 +27,7 @@ public:
                 if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
                     this->penY = constantPenY;
                 } else
-                    this->penY = constantPenY - 0.2;
+                    this->penY = constantPenY - 0.35;
                 // Handle continous click
                 if (this->movingForwad) {
                     this->isMoving = true; // Set penguin status to moving
@@ -159,22 +159,21 @@ public:
     
     
     float getNextLaneZ(vector<Lane> &lanesArray) {
-        for (int i = 0; i < lanesArray.size(); i++) {
-            if (double_equals(lanesArray[i].laneZPos, this->penZ)) {
-                this->adjacentLaneIndex = i+1;
-                this->isMovedToAdjacentLane = false;
-                return lanesArray[i + 1].laneZPos;
-            }
+        if(lanesArray[this->currentLaneIndex+1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex+1].treeXpos - this->penX) < 1){
+            return 0;
         }
-        return this->penZ;
+        this->adjacentLaneIndex = this->currentLaneIndex+1;
+        this->isMovedToAdjacentLane = false;
+        return lanesArray[this->currentLaneIndex + 1].laneZPos;
     }
     float getPreviousLaneZ(vector<Lane> &lanesArray) {
-        for (int i = 0; i < lanesArray.size(); i++) {
-            if (i > 0 && double_equals(lanesArray[i].laneZPos, this->penZ)) {
-                this->adjacentLaneIndex = i-1;
-                this->isMovedToAdjacentLane = false;
-                return lanesArray[i - 1].laneZPos;
+        if(this->currentLaneIndex > 0){
+            if(lanesArray[this->currentLaneIndex-1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex-1].treeXpos - this->penX) < 1){
+                return 0;
             }
+            this->adjacentLaneIndex = this->currentLaneIndex-1;
+            this->isMovedToAdjacentLane = false;
+            return lanesArray[this->currentLaneIndex - 1].laneZPos;
         }
         return this->penZ;
     }
@@ -187,22 +186,29 @@ public:
         this->movingLeft = movingLeft;
         this->movingBackward = movingBackward;
         if (movingForward && !isMoving) {
-            this->isMoving = true; // Set penguin status to moving
-            this->targetZ = getNextLaneZ(lanesArray);
-            this->initalZ = this->penZ;
-        }
-        if (movingBackward && !isMoving) {
-            if (getPenZ() <= lanesArray[0].laneZPos - 3) {
+            float target =getNextLaneZ(lanesArray);
+            if(target != 0){ // no tree
                 this->isMoving = true; // Set penguin status to moving
-                this->targetZ = getPreviousLaneZ(lanesArray);
+                this->targetZ =target;
                 this->initalZ = this->penZ;
             }
         }
-        if (movingRight && getPenX() < 9.5) {
+        if (movingBackward && !isMoving) {
+            if (getPenZ() <= lanesArray[0].laneZPos - 3) {
+                float target =getPreviousLaneZ(lanesArray);
+                if(target != 0){
+                    this->isMoving = true; // Set penguin status to moving
+                    this->targetZ = target;
+                    this->initalZ = this->penZ;
+                }
+            }
+        }
+        if (movingRight && getPenX() < 9.5 && (((lanesArray[this->currentLaneIndex].type == SAFE_LANE && abs(lanesArray[currentLaneIndex].treeXpos - getPenX()) > 1)) || lanesArray[this->currentLaneIndex].type == NORMAL_LANE)
+            ) {
             setPenX(getPenX() + penguinSpeed * deltaTime);
             
         }
-        if (movingLeft && getPenX() > -7) {
+        if (movingLeft && getPenX() > -7 && (((lanesArray[this->currentLaneIndex].type == SAFE_LANE && abs(lanesArray[currentLaneIndex].treeXpos - getPenX()) > 1)) || lanesArray[this->currentLaneIndex].type == NORMAL_LANE)) {
             setPenX(getPenX() - penguinSpeed * deltaTime);
         }
     }
@@ -246,12 +252,12 @@ public:
             }
             //collision with car's behind
             
-            if ((penLeftPos < carRightPos) && (penRightPos >= carLeftPos) && this->penY < this->constantPenY - 0.2 + 0.4) {
+            if ((penLeftPos < carRightPos) && (penRightPos >= carLeftPos) && this->penY < constantPenY - 0.2 + 0.4) {
                 carCollided = true;
                 
             }
             //collision with car's front
-            if ((penRightPos >= carLeftPos) && (penLeftPos < carRightPos) && this->penY < this->constantPenY - 0.2 + 0.4) {
+            if ((penRightPos >= carLeftPos) && (penLeftPos < carRightPos) && this->penY < constantPenY - 0.2 + 0.4) {
                 carCollided = true;
             }
         }
@@ -296,12 +302,13 @@ public:
     void setCurrentLaneIndex(int currentLane){
         this->currentLaneIndex = currentLane;
     }
-    float getPenguinConstantY(){
-        return constantPenY;
+    void setAdjacentLaneIndex(int adjLane){
+        this->adjacentLaneIndex = adjLane;
     }
+    
+    const GLfloat penguinSpeed = 0.04f;
+    const GLfloat constantPenY = 1.35f;
 private:
-    const float penguinSpeed = 0.04f;
-    const float constantPenY = 1.13f;
     Shader shader;
     Camera& camera;
     PenModel* penguinModel;

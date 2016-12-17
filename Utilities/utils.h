@@ -16,7 +16,8 @@ public:
     constexpr static const GLfloat COIN_Y = 1.2;
     constexpr static const GLuint SHADOW_WIDTH = 4400;
     constexpr static const GLuint SHADOW_HEIGHT = 4000;
-
+    constexpr static const GLint gameWidth = 750;
+    constexpr static const GLint gameHeight = 800;
 };
 struct Lane {
     float laneZPos;

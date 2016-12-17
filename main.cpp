@@ -20,17 +20,13 @@ GLfloat lastFrame = 0.0f;
 
 Camera camera(glm::vec3(0.0f, 4.0f, 5.0f));
 
-// Configure depth map FBO (UHD 3840×2160) resolution for better shadow Appearance
-const GLint gameWidth = 750;
-const GLint gameHeight = 800;
-
 long score = 0;
 bool gameOver = false;
 bool exitGame = false;
 bool gameOverSoundPlayed= false;
 GLFWwindow* window;
 
-float lightX = -22, lightY = 35, lightZ = -30, lookAtX = 0,lookAtY = 0,lookAtZ = -30;
+float lightX = -22, lightY = 35, lightZ = -30, lookAtX = 0,lookAtY = 0,lookAtZ = -25;
 
 collisionStatus collisionState;
 
@@ -42,7 +38,7 @@ int main(int argc, const char * argv[]) {
     
     // initialize game
     GraphicsUtilities graphicsUtilities(&camera);
-    if(0 != graphicsUtilities.initializeGameWindow(gameWidth, gameHeight, 3, 3, window)){
+    if(0 != graphicsUtilities.initializeGameWindow(Constants::gameWidth, Constants::gameHeight, 3, 3, window)){
         return -1;
     }
     // Load SHADERS
@@ -69,7 +65,7 @@ int main(int argc, const char * argv[]) {
     GameScene gameScene(sceneShader);
     // Load MODELS
     Penguin penguin(materialShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
-    penguin.setPenPosition(0, penguin.getPenguinConstantY(), -3.3f); // Set initial posisiton
+    penguin.setPenPosition(0, penguin.constantPenY, -3.3f); // Set initial posisiton
     Car car(textureShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
     Car truck(textureShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
     Coin coin(textureShader ,"/Users/ibrahimradwan/Desktop/coin/Gems/diamond_orange.obj");
@@ -83,7 +79,7 @@ int main(int argc, const char * argv[]) {
     GLuint frameCount = 0;
     
     // Loading fonts
-    Fonts fonts(fontShader, gameWidth, gameHeight, "/Users/ibrahimradwan/Desktop/zorque.ttf");
+    Fonts fonts(fontShader, Constants::gameWidth, Constants::gameHeight, "/Users/ibrahimradwan/Desktop/zorque.ttf");
     
     // Load the Lane-cube into the fragment
     GLuint VBO, VAO;
@@ -134,7 +130,7 @@ int main(int argc, const char * argv[]) {
         lookAtZ = penguin.getPenZ() + 36.3;
         
         // Clear screen with certain background color
-        glViewport(0, 0, gameWidth*2, gameHeight*2);
+        glViewport(0, 0, Constants::gameWidth*2, Constants::gameHeight*2);
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         // Clear depth and color buffers with each iteration so the new values can be applied without blocking
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -147,15 +143,16 @@ int main(int argc, const char * argv[]) {
         penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
         
         // penguin drawing
-        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)gameHeight/gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
+        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)Constants::gameHeight/Constants::gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars + Diamonds + trees)
-        gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) gameHeight/(float)gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
+        gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) Constants::gameHeight/(float)Constants::gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
         if (penguin.getPenZ() < lanesArray[34].laneZPos){
             Utilities::addMoreLanes(lanesArray);
-            penguin.setCurrentLaneIndex(4);
+            penguin.setCurrentLaneIndex(2);
+            penguin.setAdjacentLaneIndex(3);
         }
         // Check for collisions
         collisionState=penguin.detectCollision(lanesArray);
@@ -169,11 +166,11 @@ int main(int argc, const char * argv[]) {
         graphicsUtilities.score(lanesArray,score, &penguin, engine);
         
         // Display score
-        fonts.RenderText("Score: " + to_string(score), 25.0f, gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
+        fonts.RenderText("Score: " + to_string(score), 25.0f, Constants::gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
         
         if(gameOver){
             // Print lossing msg
-            fonts.RenderText("You lost!", gameWidth/2.0f - 80, gameHeight/ 2.0f, 0.8f, glm::vec3(1, 1, 0));
+            fonts.RenderText("You lost!", Constants::gameWidth/2.0f - 80, Constants::gameHeight/ 2.0f, 0.8f, glm::vec3(1, 1, 0));
             
             // Click enter to restart game
             glfwSwapBuffers(window);
