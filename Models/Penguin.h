@@ -242,22 +242,6 @@ public:
         float penLeftPos = getPenX() - (1.492 * 0.13);
         float carRightPos, carLeftPos;
         float coinRightPos, coinLeftPos;
-        //collision with coins
-        if (lanesArray[getCurrentLane()].hasCoin) {
-            coinRightPos = lanesArray[getCurrentLane()].coinXPosition + 0.4;
-            coinLeftPos = lanesArray[getCurrentLane()].coinXPosition - 0.4;
-            
-            if ((penLeftPos < coinRightPos)
-                && (penRightPos >= coinLeftPos) || (penRightPos >= coinLeftPos)
-                && (penLeftPos < coinRightPos)) {
-                
-                coinCollided = true;
-                
-            }
-            if (coinCollided) {
-                return coinCollision;
-            }
-        }
         //collision with cars
         if (lanesArray[getCurrentLane()].type) {
             
