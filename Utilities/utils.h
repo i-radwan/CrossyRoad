@@ -29,15 +29,15 @@ struct Lane {
     float coinXPosition = 0;
     float coinRotation = 0;
     bool isCoinConsumed = false;
-    float treeXpos = -3;
+    float treeXpos = 30;
     bool treeDrawn = 0;
     Lane(){
-        setTreeXPos();
-        
     }
     void setTreeXPos(){
-        // 77 is the first number popped in my mind, ther is no scientific reason behind.
-        treeXpos = ( (rand() * rand() * rand() * rand())%77 * (rand() > 6 ? -1 : 1 ))%15;
+        if(laneZPos < -10){ // no trees at start
+            // 77 is the first number popped in my mind, ther is no scientific reason behind.
+            treeXpos = ( (rand() * rand() * rand() * rand())%77 * (rand() > 6 ? -1 : 1 ))%15;
+        }
     }
     void setCoinPosition(){
         if(laneZPos < -4 && !hasCoin && !drawnBefore){
@@ -131,6 +131,7 @@ public:
             s.type = static_cast<LaneType>(lanesData[i]);
             s.drawnBefore = 0;
             s.laneZPos = laneZ;
+            s.setTreeXPos();
             s.setCoinPosition();
             if(random % 3 == 1 ){
                 s.isTruck = true;
@@ -174,6 +175,7 @@ public:
             lastCarSpeed = min(lanesArray[j].getLaneCarSpeed(), lastCarSpeed);
             lastLaneZPos = s.laneZPos;
             lastLaneType = s.type;
+            
         }
         for(int i = 0, j = (52-32); i < 32; i++, j++){
             if(i == 0){
@@ -194,6 +196,9 @@ public:
             s.type = static_cast<LaneType>(lanesData[i]);
             s.drawnBefore = 0;
             s.laneZPos = lastLaneZPos;
+            if(i%35 != 0){
+                s.setTreeXPos();
+            }
             s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
                 s.isTruck = true;

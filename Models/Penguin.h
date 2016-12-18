@@ -217,22 +217,25 @@ public:
             }
         }
         if (movingRight && getPenX() < 9.5) {
-            
+            if(!((movingBackward||movingForward) && lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE)){
+
             if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
                 && (
-                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
+                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9
                     ) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
                 setPenX(getPenX() + penguinSpeed * deltaTime);
+                }
             }
             
         }
         if (movingLeft && getPenX() > -7) {
+            if(!((movingBackward||movingForward) && lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE)){
             if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
                && (
-               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
+               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9
                ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
                 setPenX(getPenX() - penguinSpeed * deltaTime);
-            }
+               }}
         }
     }
     collisionStatus detectCollision(vector<Lane> &lanesArray) {

@@ -149,6 +149,9 @@ int main(int argc, const char * argv[]) {
         gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) Constants::gameHeight/(float)Constants::gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
+        if(penguin.getCurrentLane() > 33){
+            cout << " nEXT is gENERATION"<<endl;
+        }
         if (penguin.getCurrentLane() > 34){
             Utilities::addMoreLanes(lanesArray);
             penguin.setCurrentLaneIndex(3);
