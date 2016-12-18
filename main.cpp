@@ -394,6 +394,8 @@ int main(int argc, const char * argv[]) {
         // Display score
         fonts.RenderText("Score: " + to_string(score), 25.0f, Constants::gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
         
+        cout << "CURRENT LANE CAR LOCATION AND SPEED "  << penguin.getCurrentLane() << " " << lanesArray[penguin.getCurrentLane()].getLaneCarXPosition() << " AND POST "<<  lanesArray[penguin.getCurrentLane()].getLaneCarSpeed() <<endl;
+
         if(gameOver) {
             cout << "DEAD ON " << penguin.getCurrentLane() << " AND X " << penguin.getPenX()<<endl;
             // Print lossing msg

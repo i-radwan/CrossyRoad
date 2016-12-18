@@ -311,6 +311,7 @@ public:
         //            framesNumber *= 1.3f;
         //        }
         //        else
+        cout << " FRAMES BEFORE :: " <<framesNumber<<endl;
         if(absSpeed > 0.3){
             
         }
