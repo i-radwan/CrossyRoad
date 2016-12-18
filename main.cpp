@@ -149,12 +149,12 @@ int main(int argc, const char * argv[]) {
         gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) Constants::gameHeight/(float)Constants::gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
-        if (penguin.getPenZ() < lanesArray[34].laneZPos){
+        if (penguin.getCurrentLane() > 34){
             Utilities::addMoreLanes(lanesArray);
-            penguin.setCurrentLaneIndex(2);
-            penguin.setAdjacentLaneIndex(3);
+            penguin.setCurrentLaneIndex(3);
+            penguin.setAdjacentLaneIndex(4);
         }
-        // Check for collisions
+        // Check forx collisions
         collisionState=penguin.detectCollision(lanesArray);
         if (collisionState == carCollision) {
             gameOver = true;

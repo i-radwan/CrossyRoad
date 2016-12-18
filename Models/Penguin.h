@@ -38,11 +38,13 @@ public:
                     }
                 }
                 if (this->movingBackward) {
-                    float target =getPreviousLaneZ(lanesArray);
-                    if(!double_equals(target, 0)){ // no tree
-                        this->isMoving = true; // Set penguin status to moving
-                        this->targetZ = target;
-                        this->initalZ = this->penZ;
+                    if (getPenZ() <= lanesArray[0].laneZPos - 3) {
+                        float target =getPreviousLaneZ(lanesArray);
+                        if(!double_equals(target, 0)){ // no tree
+                            this->isMoving = true; // Set penguin status to moving
+                            this->targetZ = target;
+                            this->initalZ = this->penZ;
+                        }
                     }
                 }
             }
@@ -170,7 +172,7 @@ public:
     
     
     float getNextLaneZ(vector<Lane> &lanesArray) {
-        if(lanesArray[this->currentLaneIndex+1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex+1].treeXpos - this->penX) < 1){
+        if(lanesArray[this->currentLaneIndex+1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex+1].treeXpos - this->penX) < 0.9){
             return 0;
         }
         this->adjacentLaneIndex = this->currentLaneIndex+1;
@@ -179,7 +181,7 @@ public:
     }
     float getPreviousLaneZ(vector<Lane> &lanesArray) {
         if(this->currentLaneIndex > 0){
-            if(lanesArray[this->currentLaneIndex-1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex-1].treeXpos - this->penX) < 1){
+            if(lanesArray[this->currentLaneIndex-1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex-1].treeXpos - this->penX) < 0.9){
                 return 0;
             }
             this->adjacentLaneIndex = this->currentLaneIndex-1;

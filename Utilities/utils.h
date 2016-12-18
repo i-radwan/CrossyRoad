@@ -132,7 +132,7 @@ public:
             s.drawnBefore = 0;
             s.laneZPos = laneZ;
             s.setCoinPosition();
-            if(random % 3 == 1 || random % 5 == 1 ){
+            if(random % 3 == 1 ){
                 s.isTruck = true;
             }
             // Set speed ToDo fix this
