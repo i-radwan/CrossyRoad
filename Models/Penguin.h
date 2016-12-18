@@ -314,6 +314,12 @@ public:
         if(absSpeed > 0.3){
             
         }
+        else if (absSpeed>0.22){
+            framesNumber *= 0.5f;
+        }
+        else if (absSpeed > 0.15) {
+            framesNumber *= 0.6f;
+        }
         else if(absSpeed > 0.1){
             framesNumber *= 0.4f;
         }
