@@ -92,16 +92,34 @@ bfsNode* test(bfsNode* currentbfsNode){
         testPen->setPenX(tmp->nodeX-9);
         testPen->setCurrentLaneIndex(tmp->laneZIndex +1);
         float framesToBeAdded = 0;
-        if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-            framesToBeAdded = 25.0/3;
-        else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-                 currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-            framesToBeAdded = 38.0/3;
-        else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-            framesToBeAdded = 52.0/3;
-        
+
+        if(nextLane.getLaneCarXPosition() > tmp->nodeX -9+2){
+            if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+                framesToBeAdded = 25.0;
+            else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+                     currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+                framesToBeAdded = 38.0;
+            else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+                framesToBeAdded = 52.0;
+
+        }else { // before
+            if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+                framesToBeAdded = 25.0/3;
+            else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+                     currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+                framesToBeAdded = 38.0/3;
+            else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+                framesToBeAdded = 52.0/3;
+            
+        }
+        float horzFramesCount = 0;
+            if(currentLane.getLaneCarXPosition() > tmp->nodeX -9){
+                horzFramesCount = 40.0;
+            } else { // before
+               horzFramesCount = -40.0/2;
+            }
         if(tmp->laneZIndex+1 < 50 && !visited[tmp->laneZIndex+1][tmp->nodeX] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+framesToBeAdded) == noCollision
+           testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == noCollision
            ){
             
             if(!(lanesArray[tmp->laneZIndex +1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex +1].treeXpos - (tmp->nodeX-9)) < 1.3)){
@@ -121,7 +139,7 @@ bfsNode* test(bfsNode* currentbfsNode){
         testPen->setPenX(tmp->nodeX-7);
         
         if(tmp->nodeX+1 < 17 &&!visited[tmp->laneZIndex][tmp->nodeX+1] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+6) == noCollision){
+           testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == noCollision){
             if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
                 && (abs((tmp->nodeX-9)+1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)+1 > lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
                 
@@ -130,7 +148,7 @@ bfsNode* test(bfsNode* currentbfsNode){
                 newNode->laneZIndex = tmp->laneZIndex;
                 newNode->parent = tmp;
                 newNode->move = 3;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+6;
+                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
                 tmp->next = newNode;
                 q.push(newNode);
                 visited[tmp->laneZIndex][tmp->nodeX+1] = 1;
@@ -140,7 +158,7 @@ bfsNode* test(bfsNode* currentbfsNode){
         testPen->setPenZ(currentLane.laneZPos);
         testPen->setPenX(tmp->nodeX-9);
         if(tmp->nodeX-1 > 0 &&!visited[tmp->laneZIndex][tmp->nodeX-1]&&
-           testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+6) == noCollision){
+           testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == noCollision){
             
             if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
                 && (abs((tmp->nodeX-9)-1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)-1 < lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
@@ -150,7 +168,7 @@ bfsNode* test(bfsNode* currentbfsNode){
                 newNode->parent = tmp;
                 newNode->move = 4;
                 tmp->next = newNode;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+6;
+                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
                 q.push(newNode);
                 visited[tmp->laneZIndex][tmp->nodeX-1] = 1;
             }
@@ -161,7 +179,7 @@ bfsNode* test(bfsNode* currentbfsNode){
         testPen->setPenX((tmp->nodeX-9));
         
         if(tmp->laneZIndex-1 > 0 && !visited[tmp->laneZIndex-1][tmp->nodeX] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+framesToBeAdded) == noCollision){
+           testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == noCollision){
             
             if(!(lanesArray[tmp->laneZIndex -1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex -1].treeXpos - (tmp->nodeX-9)) < 1.3)){
                 
@@ -185,7 +203,7 @@ bfsNode* test(bfsNode* currentbfsNode){
     return 0;
 }
 int main(int argc, const char * argv[]) {
-    
+    srand(time(NULL));
     // initialize game
     GraphicsUtilities graphicsUtilities(&camera);
     if(0 != graphicsUtilities.initializeGameWindow(Constants::gameWidth, Constants::gameHeight, 3, 3, window)){
@@ -377,6 +395,7 @@ int main(int argc, const char * argv[]) {
         fonts.RenderText("Score: " + to_string(score), 25.0f, Constants::gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
         
         if(gameOver) {
+            cout << "DEAD ON " << penguin.getCurrentLane() << " AND X " << penguin.getPenX()<<endl;
             // Print lossing msg
             fonts.RenderText("You lost!", Constants::gameWidth/2.0f - 80, Constants::gameHeight/ 2.0f, 0.8f, glm::vec3(1, 1, 0));
             
