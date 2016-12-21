@@ -21,7 +21,9 @@ public:
     void movePenguinTowardsTarget(float deltaTime, vector<Lane> &lanesArray) {
         if (isMoving) {
             if (Utilities::double_equals(this->targetZ, this->penZ)) {
-                //                cout << "EQUAL" << fCount << "WHERE CLANE " <<  lanesArray[this->currentLaneIndex].type << " NLANE " << lanesArray[this->currentLaneIndex+1].type << " PLANE " << lanesArray[this->currentLaneIndex-1].type <<endl;
+                cout << "EQUAL" << fCount << "WHERE CLANE " <<  lanesArray[this->currentLaneIndex].type << " NLANE " << lanesArray[this->currentLaneIndex+1].type << " PLANE " << lanesArray[this->currentLaneIndex-1].type
+                << " InitialZ " << initalZ <<" TARGETZ " << targetZ
+                <<endl;
                 fCount = 0;
                 isMoving = false;
                 if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
@@ -219,17 +221,17 @@ public:
         }
         if (movingRight && getPenX() < 9.5) {
             if(movingForward){
-                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
+                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 0.9) || (this->penX > lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() + penguinSpeed * deltaTime);
                 }
             }
             else if (movingBackward){
-                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
+                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 0.9) || (this->penX > lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() + penguinSpeed * deltaTime);
                 }
             }
             else{
-                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
                     setPenX(getPenX() + penguinSpeed * deltaTime);
                 }
             }
@@ -237,16 +239,16 @@ public:
         }
         if (movingLeft && getPenX() > -7) {
             if(movingForward){
-                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
+                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 0.9) || (this->penX < lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() - penguinSpeed * deltaTime);
                 }
             }
             else if (movingBackward){
-                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
+                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 0.9) || (this->penX < lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() - penguinSpeed * deltaTime);
                 }
             }else{
-                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
                     setPenX(getPenX() - penguinSpeed * deltaTime);
                 }
             }
