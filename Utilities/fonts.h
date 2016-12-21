@@ -7,7 +7,6 @@
 class Fonts{
 public:
     Fonts(Shader shader, GLfloat gameWidth, GLfloat gameHeight, const char* fontPath):shader(shader){
-        // Loading font part, ToDo (move to another class)
         glm::mat4 projection = glm::ortho(0.0f, (gameWidth), 0.0f, (gameHeight));
         shader.Use();
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));

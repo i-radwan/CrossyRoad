@@ -22,7 +22,7 @@ public:
         glUniform1i(glGetUniformLocation(shader.Program, "shadows"), shadows);
         glm::mat4 objprojection = glm::perspective(cameraZoom, hwRatio, near, far);
         glm::mat4 objmodel;
-        objmodel = glm::translate(objmodel, glm::vec3( coinX, coinY, coinZ)); // ToDo use coinY
+        objmodel = glm::translate(objmodel, glm::vec3( coinX, coinY, coinZ));
         objmodel = glm::rotate(objmodel, glm::radians(-rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
         objmodel = glm::scale(objmodel, glm::vec3(0.1f, 0.1f, 0.1f));
         GLint objmodelLoc = glGetUniformLocation(shader.Program, "model");
@@ -35,7 +35,7 @@ public:
     }
     void render(Shader &depthShader, float coinX, float coinY, float coinZ, float rotationAngle){
         glm::mat4 objmodel;
-        objmodel = glm::translate(objmodel, glm::vec3( coinX, coinY, coinZ)); // ToDo use coinY
+        objmodel = glm::translate(objmodel, glm::vec3( coinX, coinY, coinZ));
         objmodel = glm::rotate(objmodel, glm::radians(-rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
         objmodel = glm::scale(objmodel, glm::vec3(0.1f, 0.1f, 0.1f));
         GLint objmodelLoc = glGetUniformLocation(depthShader.Program, "model");

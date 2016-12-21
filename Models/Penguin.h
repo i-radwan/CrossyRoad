@@ -6,8 +6,8 @@
 #include <string>
 
 using namespace std;
-enum collisionStatus {
-    carCollision, coinCollision, noCollision
+enum CollisionStatus {
+    CAR_COLLISION, COIN_COLLISION, NO_COLLISION
 };
 class Penguin {
     
@@ -38,33 +38,19 @@ public:
                     }
                 }
                 if (this->movingBackward) {
-<<<<<<< HEAD
                     if (getPenZ() <= lanesArray[0].laneZPos - 3) {
                         float target =getPreviousLaneZ(lanesArray);
-                        if(!double_equals(target, 0)){ // no tree
+                        if(!Utilities::double_equals(target, 0)){ // no tree
                             this->isMoving = true; // Set penguin status to moving
                             this->targetZ = target;
                             this->initalZ = this->penZ;
                         }
-||||||| merged common ancestors
-                    float target =getPreviousLaneZ(lanesArray);
-                    if(!double_equals(target, 0)){ // no tree
-                        this->isMoving = true; // Set penguin status to moving
-                        this->targetZ = target;
-                        this->initalZ = this->penZ;
-=======
-                    float target =getPreviousLaneZ(lanesArray);
-                    if(!Utilities::double_equals(target, 0)){ // no tree
-                        this->isMoving = true; // Set penguin status to moving
-                        this->targetZ = target;
-                        this->initalZ = this->penZ;
->>>>>>> autorun
                     }
                 }
             }
             if (!Utilities::double_equals(this->targetZ, this->penZ)
                 && this->targetZ < this->penZ) {
-                // Jump the penguin
+                // Jump the penguin forward
                 if (this->targetZ - this->penZ > (this->penZ - this->initalZ)){
                     this->penY -= 0.07f;
                     if(!this->isMovedToAdjacentLane){
@@ -83,7 +69,7 @@ public:
             } else if (!Utilities::double_equals(this->targetZ, this->penZ)
                        && this->targetZ > this->penZ) {
                 if (this->targetZ - this->penZ > (this->penZ - this->initalZ))
-                    this->penY += 0.15f;
+                    this->penY += 0.07f;
                 else{
                     if(!this->isMovedToAdjacentLane){
                         this->isMovedToAdjacentLane = true;
@@ -187,7 +173,7 @@ public:
     
     
     float getNextLaneZ(vector<Lane> &lanesArray) {
-        if(lanesArray[this->currentLaneIndex+1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex+1].treeXpos - this->penX) < 0.9){
+        if(lanesArray[this->currentLaneIndex+1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex+1].treeXpos - this->penX) < 1){
             return 0;
         }
         this->adjacentLaneIndex = this->currentLaneIndex+1;
@@ -196,7 +182,7 @@ public:
     }
     float getPreviousLaneZ(vector<Lane> &lanesArray) {
         if(this->currentLaneIndex > 0){
-            if(lanesArray[this->currentLaneIndex-1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex-1].treeXpos - this->penX) < 0.9){
+            if(lanesArray[this->currentLaneIndex-1].type == SAFE_LANE &&  abs(lanesArray[this->currentLaneIndex-1].treeXpos - this->penX) < 1){
                 return 0;
             }
             this->adjacentLaneIndex = this->currentLaneIndex-1;
@@ -232,50 +218,41 @@ public:
             }
         }
         if (movingRight && getPenX() < 9.5) {
-            if(!((movingBackward||movingForward) && lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE)){
-
-            if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
-                && (
-                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9
-                    ) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
-<<<<<<< HEAD
-                setPenX(getPenX() + penguinSpeed * deltaTime);
-                }
-            }
-||||||| merged common ancestors
-                setPenX(getPenX() + penguinSpeed * deltaTime);
-            }
-=======
+            if(movingForward){
+                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() + penguinSpeed * deltaTime);
                 }
->>>>>>> autorun
+            }
+            else if (movingBackward){
+                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
+                    setPenX(getPenX() + penguinSpeed * deltaTime);
+                }
+            }
+            else{
+                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX > lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                    setPenX(getPenX() + penguinSpeed * deltaTime);
+                }
+            }
             
         }
         if (movingLeft && getPenX() > -7) {
-            if(!((movingBackward||movingForward) && lanesArray[currentLaneIndex+1].type == LaneType::SAFE_LANE)){
-            if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE
-<<<<<<< HEAD
-               && (
-               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 0.9
-               ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
-                setPenX(getPenX() - penguinSpeed * deltaTime);
-               }}
-||||||| merged common ancestors
-               && (
-               abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
-               ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
-                setPenX(getPenX() - penguinSpeed * deltaTime);
-            }
-=======
-                && (
-                    abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1
-                    ) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+            if(movingForward){
+                if(((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)&&((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex+1].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex+1].treeXpos)) || lanesArray[currentLaneIndex+1].type == LaneType::NORMAL_LANE)){
                     setPenX(getPenX() - penguinSpeed * deltaTime);
                 }
->>>>>>> autorun
+            }
+            else if (movingBackward){
+                if(((lanesArray[currentLaneIndex-1].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex-1].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex-1].treeXpos)) || lanesArray[currentLaneIndex-1].type == LaneType::NORMAL_LANE ) && ((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE)){
+                    setPenX(getPenX() - penguinSpeed * deltaTime);
+                }
+            }else{
+                if((lanesArray[currentLaneIndex].type == LaneType::SAFE_LANE && (abs(this->penX - lanesArray[currentLaneIndex].treeXpos) > 1) || (this->penX < lanesArray[currentLaneIndex].treeXpos)) || lanesArray[currentLaneIndex].type == LaneType::NORMAL_LANE){
+                    setPenX(getPenX() - penguinSpeed * deltaTime);
+                }
+            }
         }
     }
-    collisionStatus detectCollision(vector<Lane> &lanesArray) {
+    CollisionStatus detectCollision(vector<Lane> &lanesArray) {
         bool carCollided = false;
         bool coinCollided = false;
         float penRightPos = getPenX() + (1.492 * 0.13);
@@ -309,16 +286,16 @@ public:
             }
         }
         if (carCollided) {
-            return carCollision;
+            return CAR_COLLISION;
         }
         
-        return noCollision;
+        return NO_COLLISION;
     }
     
     /*******************
      TESTING
      ******************/
-    collisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray, float framesNumber) {
+    CollisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray, float framesNumber) {
         float absSpeed = abs(lanesArray[getCurrentLane()].getLaneCarSpeed());
         //        if(absSpeed > 0.3){
         //            framesNumber *= 1.75f;
@@ -353,7 +330,6 @@ public:
         
         cout <<"MODIFIED FRAMES "<<framesNumber << " ABS " <<absSpeed<<endl;
         bool carCollided = false;
-        bool coinCollided = false;
         float penRightPos = getPenX() + (1.492 * 0.13);
         float penLeftPos = getPenX() - (1.492 * 0.13);
         float carRightPos, carLeftPos;
@@ -366,10 +342,10 @@ public:
                 carRightPos = newCarCenter + (102.966 * 0.008) + 0.9;
                 carLeftPos = newCarCenter - (102.966 * 0.008) - 0.75;
             } else { //is truck
-                //                carRightPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                //                + (312.692 * 0.008) + 0.15;
-                //                carLeftPos = lanesArray[getCurrentLane()].getLaneCarXPosition()
-                //                - (312.692 * 0.008) - 0.4;
+                carRightPos = newCarCenter
+                + (312.692 * 0.008) + 0.15;
+                carLeftPos = newCarCenter
+                - (312.692 * 0.008) - 0.4;
             }
             //collision with car's behind
             
@@ -383,10 +359,10 @@ public:
             }
         }
         if (carCollided) {
-            return carCollision;
+            return CAR_COLLISION;
         }
         
-        return noCollision;
+        return NO_COLLISION;
     }
     
     

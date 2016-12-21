@@ -1,3 +1,10 @@
+/**
+ @IAR:
+    @ToDo:
+        • Find the proper function for speed calculations
+        • Deallocate BFS nodes
+        • Fix penguin rotating while auto-running
+ */
 #include <cmath>
 #include <fstream>
 #include <map>
@@ -15,6 +22,7 @@
 #include "Models/GameScene.h"
 #include "Models/Penguin.h"
 #include <irrKlang/irrKlang.h>
+#include "Utilities/autorun.h"
 using namespace std;
 
 GLfloat deltaTime = 0.0f;    // Time between current frame and last frame
@@ -30,199 +38,29 @@ GLFWwindow* window;
 
 float lightX = -22, lightY = 35, lightZ = -30, lookAtX = 0,lookAtY = 0,lookAtZ = -25;
 vector<Lane> lanesArray;
-collisionStatus collisionState;
+CollisionStatus collisionState;
 
 //For Rendering the DepthMap (Debuging and testing)
 GLuint quadVAO = 0;
 GLuint quadVBO;
 
-<<<<<<< HEAD
 int main(int argc, const char * argv[]) {
-    srand( time( NULL ) );
-||||||| merged common ancestors
-int main(int argc, const char * argv[]) {
-    
-=======
-/**************
- TESTING
- **************/
-int iX = 0, jZ = 0;
-int penmove;
-float targetPenX ;
-bool isLookingForPathOrMoving = false;
-
-Penguin* testPen;
-struct bfsNode{
-    bfsNode* next;
-    bfsNode* parent;
-    int nodeX = 0, laneZIndex = 0;
-    int move = 0;
-    int accumulatedFramesCount =0;
-    bfsNode(){
-        next = parent = 0;
-    }
-};
-bfsNode* currentbfsNode;
-bfsNode* test(bfsNode* currentbfsNode){
-    isLookingForPathOrMoving = true;
-    vector<vector<int> > visited(50, std::vector<int> ( 17, 0)); // 50 * 17 vector to hold visited
-    int requZ = currentbfsNode->laneZIndex + 6;
-    
-    visited[currentbfsNode->laneZIndex][currentbfsNode->nodeX] = 1;
-    if(currentbfsNode->laneZIndex != testPen->getCurrentLane()){
-        cout <<"ERROR " <<  currentbfsNode->laneZIndex  << " " << testPen->getCurrentLane()<<endl;
-    }
-    queue<bfsNode*> q;
-    q.push(currentbfsNode);
-    bfsNode* tmp;
-    
-    float backupX = testPen->getPenX();
-    float backupZ = testPen->getPenZ();
-    int backupLaneIndex = testPen->getCurrentLane();
-    currentbfsNode->accumulatedFramesCount=0;
-    while(!q.empty()){
-        tmp = q.front();
-        q.pop();
-        if (tmp->laneZIndex == requZ) { // check if reached required
-            isLookingForPathOrMoving= false;
-            testPen->setPenZ(backupZ);
-            testPen->setPenX(backupX);
-            testPen->setCurrentLaneIndex(backupLaneIndex);
-            return tmp;
-        }
-        Lane nextLane, previousLane, currentLane;
-        nextLane = lanesArray[tmp->laneZIndex +1];
-        currentLane = lanesArray[tmp->laneZIndex];
-        previousLane = lanesArray[tmp->laneZIndex -1];
-        
-        testPen->setPenZ(nextLane.laneZPos);
-        testPen->setPenX(tmp->nodeX-9);
-        testPen->setCurrentLaneIndex(tmp->laneZIndex +1);
-        float framesToBeAdded = 0;
-
-        if(nextLane.getLaneCarXPosition() > tmp->nodeX -9+2){
-            if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-                framesToBeAdded = 25.0;
-            else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-                     currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-                framesToBeAdded = 38.0;
-            else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-                framesToBeAdded = 52.0;
-
-        }else { // before
-            if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-                framesToBeAdded = 25.0/3;
-            else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-                     currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-                framesToBeAdded = 38.0/3;
-            else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-                framesToBeAdded = 52.0/3;
-            
-        }
-        float horzFramesCount = 0;
-            if(currentLane.getLaneCarXPosition() > tmp->nodeX -9){
-                horzFramesCount = 40.0;
-            } else { // before
-               horzFramesCount = -40.0/2;
-            }
-        if(tmp->laneZIndex+1 < 50 && !visited[tmp->laneZIndex+1][tmp->nodeX] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == noCollision
-           ){
-            
-            if(!(lanesArray[tmp->laneZIndex +1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex +1].treeXpos - (tmp->nodeX-9)) < 1.3)){
-                
-                bfsNode* newNode = new bfsNode;
-                newNode->nodeX = tmp->nodeX;
-                newNode->laneZIndex = tmp->laneZIndex+1;
-                newNode->move = 1;
-                newNode->parent = tmp;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+framesToBeAdded;
-                tmp->next = newNode;
-                q.push(newNode);
-                visited[tmp->laneZIndex+1][tmp->nodeX] = 1;
-            }}
-        testPen->setCurrentLaneIndex(tmp->laneZIndex);
-        testPen->setPenZ(currentLane.laneZPos);
-        testPen->setPenX(tmp->nodeX-7);
-        
-        if(tmp->nodeX+1 < 17 &&!visited[tmp->laneZIndex][tmp->nodeX+1] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == noCollision){
-            if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
-                && (abs((tmp->nodeX-9)+1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)+1 > lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
-                
-                bfsNode* newNode = new bfsNode;
-                newNode->nodeX = tmp->nodeX+1;
-                newNode->laneZIndex = tmp->laneZIndex;
-                newNode->parent = tmp;
-                newNode->move = 3;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
-                tmp->next = newNode;
-                q.push(newNode);
-                visited[tmp->laneZIndex][tmp->nodeX+1] = 1;
-            }
-        }
-        testPen->setCurrentLaneIndex(tmp->laneZIndex);
-        testPen->setPenZ(currentLane.laneZPos);
-        testPen->setPenX(tmp->nodeX-9);
-        if(tmp->nodeX-1 > 0 &&!visited[tmp->laneZIndex][tmp->nodeX-1]&&
-           testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == noCollision){
-            
-            if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
-                && (abs((tmp->nodeX-9)-1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)-1 < lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
-                bfsNode* newNode = new bfsNode;
-                newNode->nodeX = tmp->nodeX-1;
-                newNode->laneZIndex = tmp->laneZIndex;
-                newNode->parent = tmp;
-                newNode->move = 4;
-                tmp->next = newNode;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
-                q.push(newNode);
-                visited[tmp->laneZIndex][tmp->nodeX-1] = 1;
-            }
-        }
-        
-        testPen->setPenZ(previousLane.laneZPos);
-        testPen->setCurrentLaneIndex(tmp->laneZIndex - 1);
-        testPen->setPenX((tmp->nodeX-9));
-        
-        if(tmp->laneZIndex-1 > 0 && !visited[tmp->laneZIndex-1][tmp->nodeX] &&
-           testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == noCollision){
-            
-            if(!(lanesArray[tmp->laneZIndex -1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex -1].treeXpos - (tmp->nodeX-9)) < 1.3)){
-                
-                bfsNode* newNode = new bfsNode;
-                newNode->nodeX = tmp->nodeX;
-                newNode->laneZIndex = tmp->laneZIndex-1;
-                newNode->parent = tmp;
-                newNode->move = 2;
-                newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+framesToBeAdded;
-                tmp->next = newNode;
-                q.push(newNode);
-                
-                visited[tmp->laneZIndex-1][tmp->nodeX] = 1;
-            }
-        }
-    }
-    testPen->setPenZ(backupZ);
-    testPen->setPenX(backupX);
-    testPen->setCurrentLaneIndex(backupLaneIndex);
-    isLookingForPathOrMoving= false;
-    return 0;
-}
-int main(int argc, const char * argv[]) {
+    // Randomize game auto generation
     srand(time(NULL));
->>>>>>> autorun
     // initialize game
     GraphicsUtilities graphicsUtilities(&camera);
     if(0 != graphicsUtilities.initializeGameWindow(Constants::gameWidth, Constants::gameHeight, 3, 3, window)){
         return -1;
     }
+    
+    // Setup autorun in case needed
+    AutoRun* autoRun = new AutoRun(lanesArray, false);//Set 2nd Arg to true to enable autoRun
     // Load SHADERS
-    Shader sceneShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shader.frag");
-    Shader materialShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
-    Shader textureShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.frag");
-    Shader fontShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/font.frag");
-    Shader simpleDepthShader("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.vs", "/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.frag");
+    Shader sceneShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.frag");
+    Shader materialShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
+    Shader textureShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.frag");
+    Shader fontShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/font.frag");
+    Shader simpleDepthShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.frag");
     
     // start the sound engine with default parameters
     irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
@@ -236,16 +74,15 @@ int main(int argc, const char * argv[]) {
     // Options
     GLboolean shadows = true;
     
-    
     // Load gamescene
     GameScene gameScene(sceneShader);
     // Load MODELS
-    Penguin penguin(materialShader, "/Users/ibrahimradwan/Desktop/penguin.dae", camera);
+    Penguin penguin(materialShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/penguin.dae", camera);
     penguin.setPenPosition(0, penguin.constantPenY, -3.3f); // Set initial posisiton
-    Car car(textureShader, "/Users/ibrahimradwan/Desktop/Small_car_obj/Small car.obj");
-    Car truck(textureShader, "/Users/ibrahimradwan/Desktop/cubus_deutz_rund/tlf16_rund.obj");
-    Coin coin(textureShader ,"/Users/ibrahimradwan/Desktop/coin/Gems/diamond_orange.obj");
-    Tree tree(textureShader, "/Users/ibrahimradwan/Desktop/Tree/tree_4.obj");
+    Car car(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/Small_car_obj/Small car.obj");
+    Car truck(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/cubus_deutz_rund/tlf16_rund.obj");
+    Coin coin(textureShader ,"/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/coin/Gems/diamond_orange.obj");
+    Tree tree(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/Tree/tree_4.obj");
     
     // Generate lanes
     Utilities::generateLanesAlgorithm(lanesArray);
@@ -254,7 +91,7 @@ int main(int argc, const char * argv[]) {
     GLuint frameCount = 0;
     
     // Loading fonts
-    Fonts fonts(fontShader, Constants::gameWidth, Constants::gameHeight, "/Users/ibrahimradwan/Desktop/zorque.ttf");
+    Fonts fonts(fontShader, Constants::gameWidth, Constants::gameHeight, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/zorque.ttf");
     
     // Load the Lane-cube into the fragment
     GLuint VBO, VAO;
@@ -274,20 +111,21 @@ int main(int argc, const char * argv[]) {
     
     //play Background Music
     
-    engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/CarHornBase.wav", true);
-    engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/180156__klankbeeld__traffic-horns-city-nervous-busy.wav", true);
-    engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/MagicMatch_GameTheme.ogg", true);
+    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/CarHornBase.wav", true);
+    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/180156__klankbeeld__traffic-horns-city-nervous-busy.wav", true);
+    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/MagicMatch_GameTheme.ogg", true);
     
     /*****************
-     TESTING
+     AUTORUN
      *****************/
-    currentbfsNode = new bfsNode();//initial point
-    currentbfsNode->laneZIndex = 2;
-    currentbfsNode->nodeX = 9;
-    targetPenX = penguin.getPenX();
-    testPen = &penguin;
+    if(autoRun->isAutoRunEnabled){
+        autoRun->currentbfsNode->laneZIndex = 2;
+        autoRun->currentbfsNode->nodeX = 9;
+        autoRun->targetPenX = penguin.getPenX();
+        autoRun->testPen = &penguin;
+    }
     /*****************
-     END TESTING
+     END AUTORUN
      *****************/
     while(!glfwWindowShouldClose(window) && !exitGame)
     {
@@ -308,50 +146,51 @@ int main(int argc, const char * argv[]) {
         //Penguin Movement Attributes
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         /**********
-         TESTING
+         AUTO RUN
          **********/
-        
-        if(!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving)){ // Penguin isn't moving
-            if(abs(targetPenX- penguin.getPenX())>0.15){
-                if(penmove == 3){
-                    movingRight = true;
-                } else if(penmove == 4){
-                    movingLeft = true;
-                }
-            }
-            if(abs(targetPenX- penguin.getPenX())<0.15){
-                
-                bfsNode* finalNode = test(currentbfsNode);
-                while(finalNode != 0){
-                    if(finalNode->move){
-                        if(finalNode->parent->move == 0){
-                            currentbfsNode = finalNode;
-                            penmove = finalNode->move;
-                        }
+        if(autoRun->isAutoRunEnabled){
+            if(!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving)){ // Penguin isn't moving
+                if(abs(autoRun->targetPenX- penguin.getPenX())>0.15){
+                    if(autoRun->penmove == 3){
+                        movingRight = true;
+                    } else if(autoRun->penmove == 4){
+                        movingLeft = true;
                     }
-                    finalNode = finalNode->parent;
                 }
-                currentbfsNode->parent = 0;
-                currentbfsNode->next = 0;
-                currentbfsNode->move = 0;
-            }
-            if(abs(targetPenX- penguin.getPenX())<0.15){
-                if(penmove == 1){
-                    movingForward = true;
-                } else if(penmove == 2){
-                    movingBackward = true;
-                } else if(penmove == 3){
-                    movingRight = true;
-                    targetPenX = penguin.getPenX() + 1;
-                } else if(penmove == 4){
-                    movingLeft = true;
-                    targetPenX = penguin.getPenX() - 1;
+                if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
+                    
+                    bfsNode* finalNode = autoRun->autoRunAlgo();
+                    while(finalNode != 0){
+                        if(finalNode->move){
+                            if(finalNode->parent->move == 0){
+                                autoRun->currentbfsNode = finalNode;
+                                autoRun->penmove = finalNode->move;
+                            }
+                        }
+                        finalNode = finalNode->parent;
+                    }
+                    autoRun->currentbfsNode->parent = 0;
+                    autoRun->currentbfsNode->next = 0;
+                    autoRun->currentbfsNode->move = 0;
                 }
-                
+                if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
+                    if(autoRun->penmove == 1){
+                        movingForward = true;
+                    } else if(autoRun->penmove == 2){
+                        movingBackward = true;
+                    } else if(autoRun->penmove == 3){
+                        movingRight = true;
+                        autoRun->targetPenX = penguin.getPenX() + 1;
+                    } else if(autoRun->penmove == 4){
+                        movingLeft = true;
+                        autoRun->targetPenX = penguin.getPenX() - 1;
+                    }
+                    
+                }
             }
         }
         /**************************
-         TEST END
+         END AUTORUN
          *************************/
         //Call Render Everything functuion
         graphicsUtilities.renderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane, glm::vec3(lightX, lightY, lightZ), lookAtX, lookAtY, lookAtZ, camera);
@@ -370,44 +209,32 @@ int main(int argc, const char * argv[]) {
         // Sart drawing
         
         // Penguin drawing
-        graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
+        if(!autoRun->isAutoRunEnabled){
+            graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
+        }
         penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
+        
         // penguin drawing
-        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)Constants::gameHeight/Constants::gameWidth, 0.1f, 1000.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
+        penguin.draw(camera.GetViewMatrix(), glm::radians(camera.Zoom), (float)Constants::gameHeight/Constants::gameWidth, 0.1f, 100.0f, frameCount, (movingForward || movingRight || movingLeft || movingBackward), deltaTime, lanesArray);
         
         // Draw the scene (lanes + cars + Diamonds + trees)
-        gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) Constants::gameHeight/(float)Constants::gameWidth,  0.1f, 1000.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
+        gameScene.draw(lightSpaceMatrix, depthMap, camera, glm::vec3(lightX, lightY, lightZ), shadows, camera.GetViewMatrix(), glm::radians(camera.Zoom), (float) Constants::gameHeight/(float)Constants::gameWidth,  0.1f, 100.0f, VAO, VAOSafeLane, lanesArray, car, truck, coin, tree);
         
         // Check if lanes generation needed
-<<<<<<< HEAD
-        if(penguin.getCurrentLane() > 33){
-            cout << " nEXT is gENERATION"<<endl;
-        }
         if (penguin.getCurrentLane() > 34){
-||||||| merged common ancestors
-        if (penguin.getPenZ() < lanesArray[34].laneZPos){
-=======
-        if (penguin.getCurrentLane() > 34){
->>>>>>> autorun
             Utilities::addMoreLanes(lanesArray);
-<<<<<<< HEAD
-            penguin.setCurrentLaneIndex(3);
-            penguin.setAdjacentLaneIndex(4);
-||||||| merged common ancestors
-            penguin.setCurrentLaneIndex(2);
-            penguin.setAdjacentLaneIndex(3);
-=======
             penguin.setCurrentLaneIndex(3);
             penguin.setAdjacentLaneIndex(4);
             /******************
-             TESTING
+             AUTORUN
              *****************/
-            currentbfsNode->laneZIndex = 3;
->>>>>>> autorun
+            if(autoRun->isAutoRunEnabled){
+                autoRun->currentbfsNode->laneZIndex = 3;
+            }
         }
-        // Check forx collisions
+        // Check for collisions
         collisionState=penguin.detectCollision(lanesArray);
-        if (collisionState == carCollision) {
+        if (collisionState == CAR_COLLISION) {
             gameOver = true;
         }
         frameCount++;
@@ -419,10 +246,9 @@ int main(int argc, const char * argv[]) {
         // Display score
         fonts.RenderText("Score: " + to_string(score), 25.0f, Constants::gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
         
-        cout << "CURRENT LANE CAR LOCATION AND SPEED "  << penguin.getCurrentLane() << " " << lanesArray[penguin.getCurrentLane()].getLaneCarXPosition() << " AND POST "<<  lanesArray[penguin.getCurrentLane()].getLaneCarSpeed() <<endl;
-
         if(gameOver) {
-            cout << "DEAD ON " << penguin.getCurrentLane() << " AND X " << penguin.getPenX()<<endl;
+            cout << "CURRENT LANE CAR LOCATION AND SPEED "  << penguin.getCurrentLane() << " XPOS:: " << lanesArray[penguin.getCurrentLane()].getLaneCarXPosition() << " AND SPEED::  "<<  lanesArray[penguin.getCurrentLane()].getLaneCarSpeed() <<endl;
+            
             // Print lossing msg
             fonts.RenderText("You lost!", Constants::gameWidth/2.0f - 80, Constants::gameHeight/ 2.0f, 0.8f, glm::vec3(1, 1, 0));
             
@@ -431,7 +257,7 @@ int main(int argc, const char * argv[]) {
             // Play gameover
             if(!gameOverSoundPlayed){
                 engine->stopAllSounds();
-                engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/GameOver.wav");
+                engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/GameOver.wav");
                 gameOverSoundPlayed = true;
             }
             do {

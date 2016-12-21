@@ -31,7 +31,6 @@ public:
         {
             glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
             // Retrieve texture number (the N in diffuse_textureN)
-            // ToDo remove not needed code
             stringstream ss;
             string number;
             string name = this->textures[i].type;
@@ -68,7 +67,6 @@ public:
         {
             glActiveTexture(GL_TEXTURE0 + i); // Activate proper texture unit before binding
             // Retrieve texture number (the N in diffuse_textureN)
-            // ToDo remove not needed code
             stringstream ss;
             string number;
             string name = this->textures[i].type;

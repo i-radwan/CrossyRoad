@@ -24,8 +24,7 @@ enum penguinMovement{
 };
 class GraphicsUtilities {
 private:
-    void static key_callback(GLFWwindow* window, int key, int scancode, int action,
-                             int mode)
+    void static key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
     {
         if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
@@ -106,8 +105,8 @@ public:
         }
         // Setup some OpenGL options
         glEnable(GL_DEPTH_TEST);
-        // Define the viewport dimensions //TODO Ya Samra
-        //glViewport(0, 0, gameWidth*2, gameHeight*2);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         return 0;
     }
     penguinMovement do_movement(GLfloat deltaTime, bool& movingForward, bool& movingBackward, bool& movingRight, bool& movingLeft)
@@ -153,8 +152,9 @@ public:
             if ((penRightPos >= coinLeftPos) && (penLeftPos < coinRightPos)) {
                 isCollided = true;
             }
-            if(isCollided) {lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
-            engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/346404__robinhood76__06698-gem-collect-ding.wav");
+            if(isCollided) {
+                lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
+                engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/346404__robinhood76__06698-gem-collect-ding.wav");
             }
         }
         //adding +100 to score if collided with a coin
@@ -173,45 +173,49 @@ public:
         // Set vectices
         if(!isSafeLane){
             GLfloat vertices[] = {
-                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+                // Front face
+                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f, // bottom-left
+                25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f, // bottom-right
+                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, // top-right
+                25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, // top-right
+                -25,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f, // top-left
+                -25, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f, // bottom-left
                 
-                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+                // Top face
+                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+                25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // top-right
+                25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+                -25,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+                -25,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // bottom-left
             };
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             
         }else{
             GLfloat vertices[] = {
-                -25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,
-                25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,
-                -25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,
-                
-                -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,
-                25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,
-                -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f
+                // Front face
+                -25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f, // bottom-left
+                25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 0.0f, // bottom-right
+                25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, // top-right
+                25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, // top-right
+                -25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f, // top-left
+                -25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f, // bottom-left
+                 // Top face
+                -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+                25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+                25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // top-right
+                25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
+                -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
+                -25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // bottom-left
             };
+
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             
         }
         
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
         glBindVertexArray(0);
         
