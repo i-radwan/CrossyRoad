@@ -16,8 +16,7 @@ class AutoRun{
     float targetPenX ;
     bool isLookingForPathOrMoving = false;
     Penguin* testPen;
-    bfsNode* currentbfsNode;
-    
+    bfsNode* currentbfsNode;    
 
     
     AutoRun(vector<Lane>& lanesVector, bool enabled = false):lanesArray(lanesVector), isAutoRunEnabled(enabled){
@@ -30,9 +29,7 @@ class AutoRun{
         int requZ = this->currentbfsNode->laneZIndex + 6;
         
         visited[currentbfsNode->laneZIndex][currentbfsNode->nodeX] = 1;
-        if(currentbfsNode->laneZIndex != testPen->getCurrentLane()){
-            cout <<"ERROR " <<  currentbfsNode->laneZIndex  << " " << testPen->getCurrentLane()<<endl;
-        }
+
         queue<bfsNode*> q;
         q.push(currentbfsNode);
         bfsNode* tmp;
@@ -40,11 +37,12 @@ class AutoRun{
         float backupX = testPen->getPenX();
         float backupZ = testPen->getPenZ();
         int backupLaneIndex = testPen->getCurrentLane();
-        currentbfsNode->accumulatedFramesCount=0;
+        
+        currentbfsNode->accumulatedFramesCount = 0;
         while(!q.empty()){
             tmp = q.front();
             q.pop();
-            if (tmp->laneZIndex == requZ) { // check if reached required
+            if (tmp->laneZIndex == requZ) { // check if target is reached
                 isLookingForPathOrMoving= false;
                 testPen->setPenZ(backupZ);
                 testPen->setPenX(backupX);
@@ -56,6 +54,7 @@ class AutoRun{
             currentLane = lanesArray[tmp->laneZIndex];
             previousLane = lanesArray[tmp->laneZIndex -1];
             
+            // Simulate moving
             testPen->setPenZ(nextLane.laneZPos);
             testPen->setPenX(tmp->nodeX-9);
             testPen->setCurrentLaneIndex(tmp->laneZIndex +1);
@@ -86,6 +85,7 @@ class AutoRun{
             } else { // before
                 horzFramesCount = -40.0/2;
             }
+
             if(tmp->laneZIndex+1 < 50 && !visited[tmp->laneZIndex+1][tmp->nodeX] &&
                testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == NO_COLLISION
                ){

@@ -200,7 +200,7 @@ public:
                 25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, // top-right
                 -25,  0.8f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 1.0f, // top-left
                 -25, -0.2f,  0.5f,  0.0f,  0.0f, 1.0f,  0.0f, 0.0f, // bottom-left
-                 // Top face
+                // Top face
                 -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
                 25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f, // bottom-right
                 25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f, // top-right
@@ -208,7 +208,7 @@ public:
                 -25,  0.8f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f, // top-left
                 -25,  0.8f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f  // bottom-left
             };
-
+            
             glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
             
         }

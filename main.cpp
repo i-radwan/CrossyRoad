@@ -54,7 +54,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // Setup autorun in case needed
-    AutoRun* autoRun = new AutoRun(lanesArray, false);//Set 2nd Arg to true to enable autoRun
+    AutoRun* autoRun = new AutoRun(lanesArray, true);//Set 2nd Arg to true to enable autoRun
     // Load SHADERS
     Shader sceneShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.frag");
     Shader materialShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
@@ -158,6 +158,7 @@ int main(int argc, const char * argv[]) {
                     }
                 }
                 if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
+                    cout<<"FC "<<fc<<endl;
                     
                     bfsNode* finalNode = autoRun->autoRunAlgo();
                     while(finalNode != 0){

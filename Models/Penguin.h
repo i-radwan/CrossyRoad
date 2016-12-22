@@ -21,9 +21,6 @@ public:
     void movePenguinTowardsTarget(float deltaTime, vector<Lane> &lanesArray) {
         if (isMoving) {
             if (Utilities::double_equals(this->targetZ, this->penZ)) {
-                cout << "EQUAL" << fCount << "WHERE CLANE " <<  lanesArray[this->currentLaneIndex].type << " NLANE " << lanesArray[this->currentLaneIndex+1].type << " PLANE " << lanesArray[this->currentLaneIndex-1].type
-                << " InitialZ " << initalZ <<" TARGETZ " << targetZ
-                <<endl;
                 fCount = 0;
                 isMoving = false;
                 if (lanesArray[this->currentLaneIndex].type == LaneType::SAFE_LANE) {
