@@ -161,7 +161,6 @@ public:
         if (isCollided) {
             score += 10;
         }
-        
     }
     void bindCube(GLuint & VBO, GLuint & VAO, bool isSafeLane = false){
         

@@ -126,7 +126,7 @@ void generateLaneData(int laneData[]){
 class Utilities{
 public:
     static int nextSafeLaneIdx(vector<Lane>& lanesArray, int currentIdx){
-        for (int i = currentIdx; i < lanesArray.size(); i++) {
+        for (int i = currentIdx+1; i < lanesArray.size(); i++) {
             if(lanesArray[i].type == SAFE_LANE){
                 return i;
             }

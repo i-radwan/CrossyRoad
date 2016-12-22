@@ -1,9 +1,9 @@
 /**
  @IAR:
-    @ToDo:
-        • Find the proper function for speed calculations
-        • Deallocate BFS nodes
-        • Fix penguin rotating while auto-running
+ @ToDo:
+ • Find the proper function for speed calculations
+ • Deallocate BFS nodes
+ • Fix penguin rotating while auto-running
  */
 #include <cmath>
 #include <fstream>
@@ -54,7 +54,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // Setup autorun in case needed
-    AutoRun* autoRun = new AutoRun(lanesArray, true);//Set 2nd Arg to true to enable autoRun
+    AutoRun* autoRun = new AutoRun(lanesArray, false);//Set 2nd Arg to true to enable autoRun
     // Load SHADERS
     Shader sceneShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.frag");
     Shader materialShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
@@ -124,6 +124,7 @@ int main(int argc, const char * argv[]) {
         autoRun->targetPenX = penguin.getPenX();
         autoRun->testPen = &penguin;
     }
+    stack<int> moves;
     /*****************
      END AUTORUN
      *****************/
@@ -148,51 +149,49 @@ int main(int argc, const char * argv[]) {
         /**********
          AUTO RUN
          **********/
-        if(autoRun->isAutoRunEnabled){
-            if(!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving)){ // Penguin isn't moving
-                if(abs(autoRun->targetPenX- penguin.getPenX())>0.15){
-                    if(autoRun->penmove == 3){
-                        movingRight = true;
-                    } else if(autoRun->penmove == 4){
-                        movingLeft = true;
-                    }
+        if(autoRun->isAutoRunEnabled) {
+            if(abs(autoRun->targetPenX- penguin.getPenX())>0.15){
+                if(autoRun->penmove == 3){
+                    movingRight = true;
+                } else if(autoRun->penmove == 4){
+                    movingLeft = true;
                 }
-                if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
-                   
+            } else {
+                if(moves.empty()){ // Penguin stopped and no moves in stack
                     bfsNode* finalNode = autoRun->autoRunAlgo();
                     autoRun->penmove = 0;
                     while(finalNode != 0){
-                        if(finalNode->move){
-                            if(finalNode->parent->move == 0){
-                                autoRun->currentbfsNode = finalNode;
-                                autoRun->penmove = finalNode->move;
-                            }
-                        }
+                        moves.push(finalNode->move);
                         finalNode = finalNode->parent;
                     }
+                    autoRun->penmove = moves.top();
+                    moves.pop();
+                    
                     if(!autoRun->penmove){
                         movingForward = movingBackward = movingLeft = movingRight = false;
                     }
                     autoRun->currentbfsNode->parent = 0;
                     autoRun->currentbfsNode->next = 0;
                     autoRun->currentbfsNode->move = 0;
+                } else if(!moves.empty() && (!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving))){ // Penguin finished current move and waiting to fetch the next
+                    autoRun->penmove = moves.top();
+                    moves.pop();
                 }
-                if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
-                    if(autoRun->penmove == 1){
-                        movingForward = true;
-                    } else if(autoRun->penmove == 2){
-                        movingBackward = true;
-                    } else if(autoRun->penmove == 3){
-                        movingRight = true;
-                        autoRun->targetPenX = penguin.getPenX() + 1;
-                    } else if(autoRun->penmove == 4){
-                        movingLeft = true;
-                        autoRun->targetPenX = penguin.getPenX() - 1;
-                    }
-                    
+                if(autoRun->penmove == 1){
+                    movingForward = true;
+                } else if(autoRun->penmove == 2){
+                    movingBackward = true;
+                } else if(autoRun->penmove == 3){
+                    movingRight = true;
+                    autoRun->targetPenX = penguin.getPenX() + 1;
+                } else if(autoRun->penmove == 4){
+                    movingLeft = true;
+                    autoRun->targetPenX = penguin.getPenX() - 1;
                 }
+                autoRun->penmove = 0;
             }
         }
+        
         /**************************
          END AUTORUN
          *************************/

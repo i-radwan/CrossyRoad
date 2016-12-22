@@ -14,7 +14,6 @@ class AutoRun{
     vector<Lane>& lanesArray;
     int penmove;
     float targetPenX ;
-    bool isLookingForPathOrMoving = false;
     Penguin* testPen;
     bfsNode* currentbfsNode;    
 
@@ -23,10 +22,15 @@ class AutoRun{
         currentbfsNode = new bfsNode();
     }
     
-    bfsNode* autoRunAlgo(){
-        isLookingForPathOrMoving = true;
+    bfsNode* autoRunAlgo() {
+        // Get current penguin lane index
+        // Get next safe index
+        // BFS from current index to next index
+        int nextSafeLaneIdx = Utilities::nextSafeLaneIdx(lanesArray, testPen->getCurrentLane());
+        
         vector<vector<int> > visited(50, std::vector<int> ( 17, 0)); // 50 * 17 vector to hold visited
-        int requZ = this->currentbfsNode->laneZIndex + 6;
+        int requZ = nextSafeLaneIdx;
+        currentbfsNode->laneZIndex = testPen->getCurrentLane();
         
         visited[currentbfsNode->laneZIndex][currentbfsNode->nodeX] = 1;
 
@@ -43,7 +47,6 @@ class AutoRun{
             tmp = q.front();
             q.pop();
             if (tmp->laneZIndex == requZ) { // check if target is reached
-                isLookingForPathOrMoving= false;
                 testPen->setPenZ(backupZ);
                 testPen->setPenX(backupX);
                 testPen->setCurrentLaneIndex(backupLaneIndex);
@@ -59,8 +62,8 @@ class AutoRun{
             testPen->setPenX(tmp->nodeX-9);
             testPen->setCurrentLaneIndex(tmp->laneZIndex +1);
             float framesToBeAdded = 0;
-            
-            float nextCarX = nextLane.getLaneCarXPosition();
+//
+//            float nextCarX = nextLane.getLaneCarXPosition();
 //            int framesToAdd = tmp->accumulatedFramesCount;
 //            while (framesToAdd > 0) {
 //                nextCarX += nextLane.getLaneCarSpeed();
@@ -69,34 +72,34 @@ class AutoRun{
 //                }
 //                framesToAdd--;
 //            }
-            if(nextCarX > tmp->nodeX -9+2){
-                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-                    framesToBeAdded = 25.0;
-                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-                    framesToBeAdded = 38.0;
-                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-                    framesToBeAdded = 53.0;
-                
-            }else { // before
-                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-                    framesToBeAdded = 25.0/2;
-                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-                    framesToBeAdded = 38.0/2;
-                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-                    framesToBeAdded = 53.0/2;
-                
-            }
+//            if(nextCarX > tmp->nodeX -9+2){
+//                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+//                    framesToBeAdded = 25.0 * 1.5;
+//                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+//                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+//                    framesToBeAdded = 38.0 * 1.5;
+//                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+//                    framesToBeAdded = 53.0 * 1.5;
+//                
+//            }else { // before
+//                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+//                    framesToBeAdded = 25.0/2;
+//                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+//                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+//                    framesToBeAdded = 38.0/2;
+//                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+//                    framesToBeAdded = 53.0/2;
+//                
+//            }
             float horzFramesCount = 0;
-            float currentLaneCarX = currentLane.getLaneCarXPosition() + currentLane.getLaneCarSpeed() * tmp->accumulatedFramesCount;
-            
-            if(currentLaneCarX > tmp->nodeX -9){
-                horzFramesCount = 6;
-            } else { // before
-                horzFramesCount = 6;
-            }
-
+//            float currentLaneCarX = currentLane.getLaneCarXPosition() + currentLane.getLaneCarSpeed() * tmp->accumulatedFramesCount;
+//            
+//            if(currentLaneCarX > tmp->nodeX -9){
+//                horzFramesCount = 6;
+//            } else { // before
+//                horzFramesCount = 6;
+//            }
+//
             if(tmp->laneZIndex+1 < 50 && !visited[tmp->laneZIndex+1][tmp->nodeX] &&
                testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+framesToBeAdded) == NO_COLLISION
                ){
@@ -179,7 +182,6 @@ class AutoRun{
         testPen->setPenZ(backupZ);
         testPen->setPenX(backupX);
         testPen->setCurrentLaneIndex(backupLaneIndex);
-        isLookingForPathOrMoving= false;
         return 0;
     }
 };
