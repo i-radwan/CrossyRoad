@@ -27,6 +27,7 @@ struct Lane {
     bool isTruck = false;
     bool hasCoin = false;
     float coinXPosition = 0;
+    float originalCarXPosition =  16 + (rand() % (int)(22 - 16 + 1));
     float coinRotation = 0;
     bool isCoinConsumed = false;
     float treeXpos = 30;
@@ -57,7 +58,8 @@ struct Lane {
     void moveCar (){
         laneCarXPosition += laneCarSpeed;
         if(laneCarXPosition < -25){
-            laneCarXPosition =  15 + (rand() % (int)(30 - 15 + 1));
+            //laneCarXPosition =  15 + (rand() % (int)(30 - 15 + 1));
+            laneCarXPosition = originalCarXPosition;
         }
     }
     void rotateCoin(){
@@ -78,7 +80,7 @@ struct Lane {
     GLfloat getLaneCarXPosition(){return this->laneCarXPosition;}
     GLfloat getLaneCarSpeed(){return this->laneCarSpeed;}
 private:
-    GLfloat laneCarXPosition =  -2 + (rand() % (int)(22 - 2 + 1));
+    GLfloat laneCarXPosition =  -2 + (rand() % (int)(22 + 2 + 1));
     GLfloat laneCarSpeed = -0.01;
 };
 
@@ -123,6 +125,14 @@ void generateLaneData(int laneData[]){
 
 class Utilities{
 public:
+    static int nextSafeLaneIdx(vector<Lane>& lanesArray, int currentIdx){
+        for (int i = currentIdx; i < lanesArray.size(); i++) {
+            if(lanesArray[i].type == SAFE_LANE){
+                return i;
+            }
+        }
+        return -1;
+    }
     static bool double_equals(double a, double b, double epsilon = 0.1) {
         return std::abs(a - b) < epsilon;
     }
@@ -138,7 +148,7 @@ public:
             s.laneZPos = laneZ;
             s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
-                //                s.isTruck = true;
+                s.isTruck = true;
             }
             if(i <= 20 == 0){
                 s.setLaneCarSpeed(s.getLaneCarSpeed() - (i + 1) * 0.001);
@@ -200,7 +210,7 @@ public:
             s.laneZPos = lastLaneZPos;
             s.setCoinPosition();
             if(random % 3 == 1 || random % 5 == 1 ){
-                //                s.isTruck = true;
+                s.isTruck = true;
             }
             if(i <= 20){
                 s.setLaneCarSpeed(s.getLaneCarSpeed() + (lastCarSpeed - (i + 1) * 0.001));

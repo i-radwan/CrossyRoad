@@ -158,9 +158,9 @@ int main(int argc, const char * argv[]) {
                     }
                 }
                 if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
-                    cout<<"FC "<<fc<<endl;
-                    
+                   
                     bfsNode* finalNode = autoRun->autoRunAlgo();
+                    autoRun->penmove = 0;
                     while(finalNode != 0){
                         if(finalNode->move){
                             if(finalNode->parent->move == 0){
@@ -169,6 +169,9 @@ int main(int argc, const char * argv[]) {
                             }
                         }
                         finalNode = finalNode->parent;
+                    }
+                    if(!autoRun->penmove){
+                        movingForward = movingBackward = movingLeft = movingRight = false;
                     }
                     autoRun->currentbfsNode->parent = 0;
                     autoRun->currentbfsNode->next = 0;
@@ -248,7 +251,7 @@ int main(int argc, const char * argv[]) {
         fonts.RenderText("Score: " + to_string(score), 25.0f, Constants::gameHeight - 60.0f, 0.8f, glm::vec3(1, 1, 0));
         
         if(gameOver) {
-            cout << "CURRENT LANE CAR LOCATION AND SPEED "  << penguin.getCurrentLane() << " XPOS:: " << lanesArray[penguin.getCurrentLane()].getLaneCarXPosition() << " AND SPEED::  "<<  lanesArray[penguin.getCurrentLane()].getLaneCarSpeed() <<endl;
+            cout << "CURRENT LANE "  << penguin.getCurrentLane() << " XPOS:: " << lanesArray[penguin.getCurrentLane()].getLaneCarXPosition() << " AND SPEED::  "<<  lanesArray[penguin.getCurrentLane()].getLaneCarSpeed() << " PengX :: " << penguin.getPenX() <<endl;
             
             // Print lossing msg
             fonts.RenderText("You lost!", Constants::gameWidth/2.0f - 80, Constants::gameHeight/ 2.0f, 0.8f, glm::vec3(1, 1, 0));

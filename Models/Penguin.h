@@ -292,9 +292,18 @@ public:
     }
     
     /*******************
-     TESTING
+     AUTO RUN
      ******************/
     CollisionStatus detectCollisionWithAutoRun(vector<Lane> &lanesArray, float framesNumber) {
+        cout << "FramesNo. " << framesNumber << endl;
+        float carX = lanesArray[getCurrentLane()].getLaneCarXPosition();
+        while (framesNumber > 0) {
+            carX += lanesArray[getCurrentLane()].getLaneCarSpeed();
+            if(carX < -25){
+                carX = lanesArray[getCurrentLane()].originalCarXPosition;
+            }
+            framesNumber--;
+        }
         float absSpeed = abs(lanesArray[getCurrentLane()].getLaneCarSpeed());
         //        if(absSpeed > 0.3){
         //            framesNumber *= 1.75f;
@@ -312,22 +321,19 @@ public:
         //            framesNumber *= 1.3f;
         //        }
         //        else
-        cout << " FRAMES BEFORE :: " <<framesNumber<<endl;
-        if(absSpeed > 0.3){
-            
-        }
-        else if (absSpeed>0.22){
-            framesNumber *= 0.5f;
-        }
-        else if (absSpeed > 0.15) {
-            framesNumber *= 0.6f;
-        }
-        else if(absSpeed > 0.1){
-            framesNumber *= 0.4f;
-        }
-        cout << " FOR LANE " << getCurrentLane() << " AS " << lanesArray[getCurrentLane()].type << " AND FRAMES "<< framesNumber << " POSITION OLD " <<lanesArray[getCurrentLane()].getLaneCarXPosition() <<" NEW POSITION " << lanesArray[getCurrentLane()].getLaneCarXPosition() + framesNumber * lanesArray[getCurrentLane()].getLaneCarSpeed() <<endl;
-        
-        cout <<"MODIFIED FRAMES "<<framesNumber << " ABS " <<absSpeed<<endl;
+//        if(absSpeed > 0.3){
+//            
+//        }
+//        else if (absSpeed>0.22){
+//            framesNumber *= 0.5f;
+//        }
+//        else if (absSpeed > 0.15) {
+//            framesNumber *= 0.6f;
+//        }
+//        else if(absSpeed > 0.1){
+//            framesNumber *= 0.4f;
+//        }
+        cout << " FOR LANE " << getCurrentLane() << " AS " << lanesArray[getCurrentLane()].type << " POSITION OLD " << lanesArray[getCurrentLane()].getLaneCarXPosition() <<" NEW POSITION " << carX << " Car speed :: " <<  lanesArray[getCurrentLane()].getLaneCarSpeed() << " PenguinPosition " << penX;
         bool carCollided = false;
         float penRightPos = getPenX() + (1.492 * 0.13);
         float penLeftPos = getPenX() - (1.492 * 0.13);
@@ -335,16 +341,16 @@ public:
         
         //collision with cars
         if (lanesArray[getCurrentLane()].type) {
-            float newCarCenter = lanesArray[getCurrentLane()].getLaneCarXPosition() + framesNumber * lanesArray[getCurrentLane()].getLaneCarSpeed();
+            float newCarCenter = carX;
             if (!lanesArray[getCurrentLane()].isTruck) {
                 //is car
-                carRightPos = newCarCenter + (102.966 * 0.008) + 0.9;
-                carLeftPos = newCarCenter - (102.966 * 0.008) - 0.75;
+                carRightPos = newCarCenter + (104.966 * 0.008) + 0.9;
+                carLeftPos = newCarCenter - (104.966 * 0.008) - 0.75;
             } else { //is truck
                 carRightPos = newCarCenter
-                + (312.692 * 0.008) + 0.15;
+                + (314.692 * 0.008) + 0.15;
                 carLeftPos = newCarCenter
-                - (312.692 * 0.008) - 0.4;
+                - (314.692 * 0.008) - 0.4;
             }
             //collision with car's behind
             
@@ -358,9 +364,10 @@ public:
             }
         }
         if (carCollided) {
+            cout << " With Collision " << endl;
             return CAR_COLLISION;
         }
-        
+        cout << endl;
         return NO_COLLISION;
     }
     
