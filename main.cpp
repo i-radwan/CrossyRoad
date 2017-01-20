@@ -56,11 +56,11 @@ int main(int argc, const char * argv[]) {
     // Setup autorun in case needed
     AutoRun* autoRun = new AutoRun(lanesArray, false);//Set 2nd Arg to true to enable autoRun
     // Load SHADERS
-    Shader sceneShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shader.frag");
-    Shader materialShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
-    Shader textureShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.frag");
-    Shader fontShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/font.frag");
-    Shader simpleDepthShader("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.vs", "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.frag");
+    Shader sceneShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shader.frag");
+    Shader materialShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
+    Shader textureShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shadow_mapping.frag");
+    Shader fontShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/font.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/font.frag");
+    Shader simpleDepthShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shadow_mapping_depth.frag");
     
     // start the sound engine with default parameters
     irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
@@ -77,12 +77,12 @@ int main(int argc, const char * argv[]) {
     // Load gamescene
     GameScene gameScene(sceneShader);
     // Load MODELS
-    Penguin penguin(materialShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/penguin.dae", camera);
+    Penguin penguin(materialShader, "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/penguin.dae", camera);
     penguin.setPenPosition(0, penguin.constantPenY, -3.3f); // Set initial posisiton
-    Car car(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/Small_car_obj/Small car.obj");
-    Car truck(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/cubus_deutz_rund/tlf16_rund.obj");
-    Coin coin(textureShader ,"/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/coin/Gems/diamond_orange.obj");
-    Tree tree(textureShader, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/Tree/tree_4.obj");
+    Car car(textureShader, "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/Small_car_obj/Small car.obj");
+    Car truck(textureShader, "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/cubus_deutz_rund/tlf16_rund.obj");
+    Coin coin(textureShader ,"/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/coin/Gems/diamond_orange.obj");
+    Tree tree(textureShader, "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/Tree/tree_4.obj");
     
     // Generate lanes
     Utilities::generateLanesAlgorithm(lanesArray);
@@ -91,7 +91,7 @@ int main(int argc, const char * argv[]) {
     GLuint frameCount = 0;
     
     // Loading fonts
-    Fonts fonts(fontShader, Constants::gameWidth, Constants::gameHeight, "/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/ModelsFiles/zorque.ttf");
+    Fonts fonts(fontShader, Constants::gameWidth, Constants::gameHeight, "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/ModelsFiles/zorque.ttf");
     
     // Load the Lane-cube into the fragment
     GLuint VBO, VAO;
@@ -111,9 +111,9 @@ int main(int argc, const char * argv[]) {
     
     //play Background Music
     
-    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/CarHornBase.wav", true);
-    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/180156__klankbeeld__traffic-horns-city-nervous-busy.wav", true);
-    engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/MagicMatch_GameTheme.ogg", true);
+    engine->play2D("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Sounds/CarHornBase.wav", true);
+    engine->play2D("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Sounds/180156__klankbeeld__traffic-horns-city-nervous-busy.wav", true);
+    engine->play2D("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Sounds/MagicMatch_GameTheme.ogg", true);
     
     /*****************
      AUTORUN
@@ -260,7 +260,7 @@ int main(int argc, const char * argv[]) {
             // Play gameover
             if(!gameOverSoundPlayed){
                 engine->stopAllSounds();
-                engine->play2D("/Users/ibrahimradwan/Development/CrossyRoad/opengl/opengl/Sounds/GameOver.wav");
+                engine->play2D("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Sounds/GameOver.wav");
                 gameOverSoundPlayed = true;
             }
             do {
