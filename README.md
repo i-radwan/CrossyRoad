@@ -22,8 +22,6 @@ This is a simple educational openGL project that looks similar to Crossyroad gam
 * GLEW 2.0.0
 * OpenGL framework
 
-penGL framework
-
 ## Auto-run!!
 To enable auto run (The penguin plays on its own):
 Set the 2nd parameter of `AutoRun` class constructor to `true` in main.cpp:57
