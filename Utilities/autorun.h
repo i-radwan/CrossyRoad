@@ -9,13 +9,14 @@ struct bfsNode{
     }
 };
 class AutoRun{
-    public:
+public:
     bool isAutoRunEnabled;
     vector<Lane>& lanesArray;
     int penmove;
     float targetPenX ;
     Penguin* testPen;
-    bfsNode* currentbfsNode;    
+    bfsNode* currentbfsNode;
+    bool isLookingForPathOrMoving = false;
 
     
     AutoRun(vector<Lane>& lanesVector, bool enabled = false):lanesArray(lanesVector), isAutoRunEnabled(enabled){
@@ -23,17 +24,14 @@ class AutoRun{
     }
     
     bfsNode* autoRunAlgo() {
-        // Get current penguin lane index
-        // Get next safe index
-        // BFS from current index to next index
-        int nextSafeLaneIdx = Utilities::nextSafeLaneIdx(lanesArray, testPen->getCurrentLane());
-        
+        isLookingForPathOrMoving = true;
         vector<vector<int> > visited(50, std::vector<int> ( 17, 0)); // 50 * 17 vector to hold visited
-        int requZ = nextSafeLaneIdx;
-        currentbfsNode->laneZIndex = testPen->getCurrentLane();
+        int requZ = currentbfsNode->laneZIndex + 6;
         
         visited[currentbfsNode->laneZIndex][currentbfsNode->nodeX] = 1;
-
+        if(currentbfsNode->laneZIndex != testPen->getCurrentLane()){
+            cout <<"ERROR " <<  currentbfsNode->laneZIndex  << " " << testPen->getCurrentLane()<<endl;
+        }
         queue<bfsNode*> q;
         q.push(currentbfsNode);
         bfsNode* tmp;
@@ -41,12 +39,12 @@ class AutoRun{
         float backupX = testPen->getPenX();
         float backupZ = testPen->getPenZ();
         int backupLaneIndex = testPen->getCurrentLane();
-        
-        currentbfsNode->accumulatedFramesCount = 0;
+        currentbfsNode->accumulatedFramesCount=0;
         while(!q.empty()){
             tmp = q.front();
             q.pop();
-            if (tmp->laneZIndex == requZ) { // check if target is reached
+            if (tmp->laneZIndex == requZ) { // check if reached required
+                isLookingForPathOrMoving= false;
                 testPen->setPenZ(backupZ);
                 testPen->setPenX(backupX);
                 testPen->setCurrentLaneIndex(backupLaneIndex);
@@ -57,51 +55,38 @@ class AutoRun{
             currentLane = lanesArray[tmp->laneZIndex];
             previousLane = lanesArray[tmp->laneZIndex -1];
             
-            // Simulate moving
             testPen->setPenZ(nextLane.laneZPos);
             testPen->setPenX(tmp->nodeX-9);
             testPen->setCurrentLaneIndex(tmp->laneZIndex +1);
             float framesToBeAdded = 0;
-//
-//            float nextCarX = nextLane.getLaneCarXPosition();
-//            int framesToAdd = tmp->accumulatedFramesCount;
-//            while (framesToAdd > 0) {
-//                nextCarX += nextLane.getLaneCarSpeed();
-//                if(nextCarX < -25){
-//                    nextCarX = nextLane.originalCarXPosition;
-//                }
-//                framesToAdd--;
-//            }
-//            if(nextCarX > tmp->nodeX -9+2){
-//                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-//                    framesToBeAdded = 25.0 * 1.5;
-//                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-//                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-//                    framesToBeAdded = 38.0 * 1.5;
-//                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-//                    framesToBeAdded = 53.0 * 1.5;
-//                
-//            }else { // before
-//                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
-//                    framesToBeAdded = 25.0/2;
-//                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
-//                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
-//                    framesToBeAdded = 38.0/2;
-//                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
-//                    framesToBeAdded = 53.0/2;
-//                
-//            }
+            
+            if(nextLane.getLaneCarXPosition() > tmp->nodeX -9+2){
+                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+                    framesToBeAdded = 25.0;
+                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+                    framesToBeAdded = 38.0;
+                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+                    framesToBeAdded = 52.0;
+                
+            }else { // before
+                if(currentLane.type == SAFE_LANE && nextLane.type == SAFE_LANE)
+                    framesToBeAdded = 25.0/3;
+                else if (currentLane.type == SAFE_LANE && nextLane.type == NORMAL_LANE ||
+                         currentLane.type == NORMAL_LANE && nextLane.type == SAFE_LANE)
+                    framesToBeAdded = 38.0/3;
+                else if (currentLane.type == NORMAL_LANE && nextLane.type == NORMAL_LANE)
+                    framesToBeAdded = 52.0/3;
+                
+            }
             float horzFramesCount = 0;
-//            float currentLaneCarX = currentLane.getLaneCarXPosition() + currentLane.getLaneCarSpeed() * tmp->accumulatedFramesCount;
-//            
-//            if(currentLaneCarX > tmp->nodeX -9){
-//                horzFramesCount = 6;
-//            } else { // before
-//                horzFramesCount = 6;
-//            }
-//
+            if(currentLane.getLaneCarXPosition() > tmp->nodeX -9){
+                horzFramesCount = 40.0;
+            } else { // before
+                horzFramesCount = -40.0/2;
+            }
             if(tmp->laneZIndex+1 < 50 && !visited[tmp->laneZIndex+1][tmp->nodeX] &&
-               testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+framesToBeAdded) == NO_COLLISION
+               testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == NO_COLLISION
                ){
                 
                 if(!(lanesArray[tmp->laneZIndex +1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex +1].treeXpos - (tmp->nodeX-9)) < 1.3)){
@@ -121,7 +106,7 @@ class AutoRun{
             testPen->setPenX(tmp->nodeX-7);
             
             if(tmp->nodeX+1 < 17 &&!visited[tmp->laneZIndex][tmp->nodeX+1] &&
-               testPen->detectCollisionWithAutoRun(lanesArray,tmp->accumulatedFramesCount+horzFramesCount) == NO_COLLISION){
+               testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == NO_COLLISION){
                 if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
                     && (abs((tmp->nodeX-9)+1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)+1 > lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
                     
@@ -130,7 +115,7 @@ class AutoRun{
                     newNode->laneZIndex = tmp->laneZIndex;
                     newNode->parent = tmp;
                     newNode->move = 3;
-                    newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+horzFramesCount;
+                    newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
                     tmp->next = newNode;
                     q.push(newNode);
                     visited[tmp->laneZIndex][tmp->nodeX+1] = 1;
@@ -139,8 +124,8 @@ class AutoRun{
             testPen->setCurrentLaneIndex(tmp->laneZIndex);
             testPen->setPenZ(currentLane.laneZPos);
             testPen->setPenX(tmp->nodeX-9);
-            if(tmp->nodeX-1 > 1 &&!visited[tmp->laneZIndex][tmp->nodeX-1]&&
-               testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+horzFramesCount) == NO_COLLISION){
+            if(tmp->nodeX-1 > 0 &&!visited[tmp->laneZIndex][tmp->nodeX-1]&&
+               testPen->detectCollisionWithAutoRun(lanesArray, horzFramesCount) == NO_COLLISION){
                 
                 if((lanesArray[tmp->laneZIndex].type == LaneType::SAFE_LANE
                     && (abs((tmp->nodeX-9)-1  - lanesArray[tmp->laneZIndex].treeXpos) > 1.3) || ((tmp->nodeX-9)-1 < lanesArray[tmp->laneZIndex].treeXpos)) || lanesArray[tmp->laneZIndex].type == LaneType::NORMAL_LANE){
@@ -150,7 +135,7 @@ class AutoRun{
                     newNode->parent = tmp;
                     newNode->move = 4;
                     tmp->next = newNode;
-                    newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+horzFramesCount;
+                    newNode->accumulatedFramesCount = tmp->accumulatedFramesCount+20;
                     q.push(newNode);
                     visited[tmp->laneZIndex][tmp->nodeX-1] = 1;
                 }
@@ -161,7 +146,7 @@ class AutoRun{
             testPen->setPenX((tmp->nodeX-9));
             
             if(tmp->laneZIndex-1 > 0 && !visited[tmp->laneZIndex-1][tmp->nodeX] &&
-               testPen->detectCollisionWithAutoRun(lanesArray, tmp->accumulatedFramesCount+framesToBeAdded) == NO_COLLISION){
+               testPen->detectCollisionWithAutoRun(lanesArray, framesToBeAdded) == NO_COLLISION){
                 
                 if(!(lanesArray[tmp->laneZIndex -1].type == SAFE_LANE &&  abs(lanesArray[tmp->laneZIndex -1].treeXpos - (tmp->nodeX-9)) < 1.3)){
                     
@@ -178,10 +163,10 @@ class AutoRun{
                 }
             }
         }
-        cout << "NOWAY!"<<endl;
         testPen->setPenZ(backupZ);
         testPen->setPenX(backupX);
         testPen->setCurrentLaneIndex(backupLaneIndex);
+        isLookingForPathOrMoving= false;
         return 0;
     }
 };

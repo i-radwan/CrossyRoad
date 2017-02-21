@@ -54,7 +54,7 @@ int main(int argc, const char * argv[]) {
     }
     
     // Setup autorun in case needed
-    AutoRun* autoRun = new AutoRun(lanesArray, false);//Set 2nd Arg to true to enable autoRun
+    AutoRun* autoRun = new AutoRun(lanesArray, true); //Set 2nd Arg to true to enable autoRun
     // Load SHADERS
     Shader sceneShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shader.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/shader.frag");
     Shader materialShader("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/objshader.vs", "/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Shaders/objshader.frag");
@@ -147,36 +147,34 @@ int main(int argc, const char * argv[]) {
         //Penguin Movement Attributes
         bool movingForward = false, movingBackward = false, movingRight = false, movingLeft = false;
         /**********
-         AUTO RUN
+         TESTING
          **********/
-        if(autoRun->isAutoRunEnabled) {
+        
+        if(!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving)){ // Penguin isn't moving
             if(abs(autoRun->targetPenX- penguin.getPenX())>0.15){
                 if(autoRun->penmove == 3){
                     movingRight = true;
                 } else if(autoRun->penmove == 4){
                     movingLeft = true;
                 }
-            } else {
-                if(moves.empty()){ // Penguin stopped and no moves in stack
-                    bfsNode* finalNode = autoRun->autoRunAlgo();
-                    autoRun->penmove = 0;
-                    while(finalNode != 0){
-                        moves.push(finalNode->move);
-                        finalNode = finalNode->parent;
+            }
+            if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
+                
+               bfsNode* finalNode = autoRun->autoRunAlgo();
+                while(finalNode != 0){
+                    if(finalNode->move){
+                        if(finalNode->parent->move == 0){
+                            autoRun->currentbfsNode = finalNode;
+                            autoRun->penmove = finalNode->move;
+                        }
                     }
-                    autoRun->penmove = moves.top();
-                    moves.pop();
-                    
-                    if(!autoRun->penmove){
-                        movingForward = movingBackward = movingLeft = movingRight = false;
-                    }
-                    autoRun->currentbfsNode->parent = 0;
-                    autoRun->currentbfsNode->next = 0;
-                    autoRun->currentbfsNode->move = 0;
-                } else if(!moves.empty() && (!(penguin.movingLeft || penguin.movingRight || penguin.movingForwad || penguin.movingBackward|| penguin.isMoving))){ // Penguin finished current move and waiting to fetch the next
-                    autoRun->penmove = moves.top();
-                    moves.pop();
+                    finalNode = finalNode->parent;
                 }
+                autoRun->currentbfsNode->parent = 0;
+                autoRun->currentbfsNode->next = 0;
+                autoRun->currentbfsNode->move = 0;
+            }
+            if(abs(autoRun->targetPenX- penguin.getPenX())<0.15){
                 if(autoRun->penmove == 1){
                     movingForward = true;
                 } else if(autoRun->penmove == 2){
@@ -188,12 +186,11 @@ int main(int argc, const char * argv[]) {
                     movingLeft = true;
                     autoRun->targetPenX = penguin.getPenX() - 1;
                 }
-                autoRun->penmove = 0;
+                
             }
         }
-        
         /**************************
-         END AUTORUN
+         TEST END
          *************************/
         //Call Render Everything functuion
         graphicsUtilities.renderEverything(simpleDepthShader, lightProjection, lightView, lightSpaceMatrix, near_plane, far_plane, gameScene, penguin, movingForward, movingBackward, movingRight, movingLeft, lanesArray, frameCount, deltaTime, depthMapFBO, depthMap, graphicsUtilities, car, truck, coin, tree, VAO, VAOSafeLane, glm::vec3(lightX, lightY, lightZ), lookAtX, lookAtY, lookAtZ, camera);
@@ -212,9 +209,9 @@ int main(int argc, const char * argv[]) {
         // Sart drawing
         
         // Penguin drawing
-        if(!autoRun->isAutoRunEnabled){
+        //if(!autoRun->isAutoRunEnabled){
             graphicsUtilities.do_movement(deltaTime, movingForward, movingBackward, movingRight, movingLeft);
-        }
+        //}
         penguin.move(movingForward, movingBackward, movingRight, movingLeft,camera, deltaTime, lanesArray);
         
         // penguin drawing

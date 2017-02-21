@@ -154,7 +154,7 @@ public:
             }
             if(isCollided) {
                 lanesArray[pen->getCurrentLane()].isCoinConsumed = true;
-                engine->play2D("/Users/ibrahimradwan/Desktop/Graphics/CrossyRoad/opengl/opengl/Sounds/346404__robinhood76__06698-gem-collect-ding.wav");
+                engine->play2D("/Users/ibrahimradwan/Development/College/CrossyRoad/opengl/opengl/Sounds/346404__robinhood76__06698-gem-collect-ding.wav");
             }
         }
         //adding +100 to score if collided with a coin
