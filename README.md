@@ -23,5 +23,8 @@ This is a simple educational openGL project that looks similar to Crossyroad gam
 * OpenGL framework
 
 ## Auto-run!!
+
+To enable auto run (The penguin plays on its own): Set the 2nd parameter of AutoRun class constructor to true in main.cpp:57
+
 #### Note
-There are some files/code blocks related to auto run functionalitiy but the auto-run isn't completed and not working properly! 
+The functionalitiy of auto run isn't working in a stable manner (Latest modification made it even worse), but if you like give it a try
